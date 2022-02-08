@@ -43,9 +43,9 @@ RUN sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y instal
 #GRAPHICS STUFF
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends libglfw3-dev && sh "./cleanup.sh"
 
-RUN wget http://mirrors.edge.kernel.org/ubuntu/pool/universe/e/eigen3/libeigen3-dev_3.3.7-3_all.deb
-RUN sudo dpkg -i libeigen3-dev_3.3.7-3_all.deb
-RUN rm libeigen3-dev_3.3.7-3_all.deb
+RUN wget http://mirrors.edge.kernel.org/ubuntu/pool/universe/e/eigen3/libeigen3-dev_3.3.7-2_all.deb
+RUN sudo dpkg -i libeigen3-dev_3.3.7-2_all.deb
+RUN rm libeigen3-dev_3.3.7-2_all.deb
 
 #pytorch
 WORKDIR /

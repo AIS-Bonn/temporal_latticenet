@@ -12,9 +12,9 @@ Afterwards, you can build the docker image which contains all the LatticeNet dep
 
 ```sh
 $ git clone --recursive https://github.com/AIS-Bonn/temporal_latticenet.git
-$ cd schuett_temporal_lattice/seq_docker
-$ ./build.sh lattice_img #this will take some time because some packages need to be build from source
-$ ./run.sh lattice_img  
+$ cd temporal_latticenet/seq_docker
+$ ./build.sh temporal_lattice_img #this will take some time because some packages need to be build from source
+$ ./run.sh temporal_lattice_img  
 $ git clone --recursive https://github.com/RaduAlexandru/easy_pbr
 $ cd easy_pbr && make && cd ..
 $ git clone --recursive https://github.com/RaduAlexandru/data_loaders 
@@ -44,6 +44,11 @@ The config files (**.cfg**) in the folder *seq_config/* manage the different mod
 The bool **sequence_learning** defines if the network should use temporal dependencies or not. 
 Meanwhile in **rnn_modules** is a array with four entries, where each entry is one of the following strings: Linear/MaxPool/CGA/CLI/LSTM/GRU/None . Our AFlow module is still called CLI in this implementation. 
 
+## Datasets
+
+Currently only [SemanticKITTI](http://www.semantic-kitti.org/) is supported.            
+[Paris-Lille-3D](https://npm3d.fr/paris-lille-3d) was implemented aswell, but the training was not pursued, due to problems with the dataset.  
+
 
 ## Pretrained Models
 
@@ -58,12 +63,3 @@ GRU-GRU-/-GRU: *model_moving_setKitti_sigma0.6_typegru-gru-none-gru_frames4_scop
 
 Without reflectance as input:                       
 GRU-GRU-AFlow-GRU: *noREF_model_moving_setKitti_sigma0.6_typegru-gru-cli-gru_frames4_scope3_epoch_2.pt*                     
-
-
-## Datasets
-
-Currently only [SemanticKITTI](http://www.semantic-kitti.org/) is supported.            
-[Paris-Lille-3D](https://npm3d.fr/paris-lille-3d) was implemented aswell, but the training was not pursued, due to problems with the dataset.  
-
-
-
