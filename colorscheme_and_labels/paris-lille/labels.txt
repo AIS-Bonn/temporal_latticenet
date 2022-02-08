@@ -1,0 +1,14 @@
+#label names
+unclassified
+ground
+buildings
+signage
+bollards
+trash cans
+barriers
+pedestrians
+cars
+vegetation
+Moving-person
+Moving-car
+

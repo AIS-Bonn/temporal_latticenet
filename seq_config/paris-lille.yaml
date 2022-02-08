@@ -1,0 +1,41 @@
+# This file is covered by the LICENSE file in the root of this project.
+labels: 
+  0: "unclassified" 
+  1: "ground"
+  2: "building"
+  3: "pole"
+  4: "bollard"
+  5: "trash can"
+  6: "barrier"
+  7: "pedestrian"
+  8: "car"
+  9: "natural"
+  10: "Moving-person"
+  11: "Moving-car"
+color_map: # bgr
+  0: [0, 0, 0]
+  1: [255, 0, 255]
+  2: [0, 200, 255]
+  3: [0, 0, 255]
+  4: [150, 240, 255]
+  5: [75, 0, 175]
+  6: [50, 120, 255]
+  7: [30, 30, 255]
+  8: [245, 150, 100]
+  9: [0, 175, 0]
+  10: [0, 51, 102]
+  11: [255, 51, 0]
+# since paris-lille only tests on 10 classes we have to map from our 12 back to 10  
+learning_map_inv: # inverse of previous map
+  0: 0      # "unlabeled", and others ignored
+  1: 1     # "ground"
+  2: 2     # "building"
+  3: 3     # "pole"
+  4: 4     # "bollard"
+  5: 5     # "trash can"
+  6: 6     # "barrier"
+  7: 7     # "person"
+  8: 8     # "car"
+  9: 9     # "natural"
+  10: 7    # "Moving-person" -> "person"
+  11: 8    # "Moving-car" -> "car"

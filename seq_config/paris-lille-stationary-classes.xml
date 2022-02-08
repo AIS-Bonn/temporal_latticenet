@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<classes>
+	 <class coarse="0" coarse_name="unclassified" id="000000000" en="unclassified" fr="non classés" desc="Not classified yet" ></class>
+	
+	 <class coarse="0" coarse_name="unclassified" id="100000000" en="other" fr="autre" desc="Undefined points, outliers, points inside buildings,..."></class>
+	 
+	 <class coarse="0" coarse_name="unclassified" id="200000000" en="surface" fr="surface" desc="Surface of unbounded or very large objects">
+	 
+		<class coarse="0" coarse_name="unclassified" id="201000000" en="other surface" fr="autre surface" desc="Surface of unbounded objects that does not fit in one of the following categories"></class>
+		<class coarse="1" coarse_name="ground" id="202000000" en="ground" fr="sol" desc="Ground surface">
+			<class coarse="1" coarse_name="ground" id="202010000" en="other ground" fr="autre sol" desc="Ground surface that does not fit in one of the following categories"></class>
+			<class coarse="1" coarse_name="ground" id="202020000" en="road" fr="rue" desc="Surface on which cars drive"></class>
+			<class coarse="1" coarse_name="ground" id="202030000" en="sidewalk" fr="trottoir" desc="Surface on which pedestrians walk, adjacent to buildings"></class>
+			<class coarse="1" coarse_name="ground" id="202040000" en="curb" fr="bord de trottoir" desc="Vertical side of the sidewalk"></class>
+			<class coarse="1" coarse_name="ground" id="202050000" en="island" fr="ilôt" desc="Surface on which pedestrians walk, isolated by the road"></class>
+			<class coarse="1" coarse_name="ground" id="202060000" en="vegetation" fr="végétation" desc="Vegetal ground such as lawn, grass..."></class>
+		</class>
+		
+		<class coarse="2" coarse_name="building" id="203000000" en="building" fr="batiment" desc="All points on the outside of the building"></class>
+	 </class>
+	 
+	 <class coarse="0" coarse_name="unclassified" id="300000000" en="object" fr="objets" desc="All objects">
+		<class coarse="0" coarse_name="unclassified" id="301000000" en="other object" fr="autre objet" desc="Objects that do not fit in one of the following categories"></class>
+		
+		<class coarse="0" coarse_name="unclassified" id="302000000" en="static" fr="statique" desc="Objects that are not made to be easily moved">
+			<class coarse="0" coarse_name="unclassified" id="302010000" en="other static" fr="autre statique" desc="Static objects that do not fit in one of the following categories"></class>
+			<class coarse="0" coarse_name="unclassified" id="302020000" en="punctual object" fr="ponctuel" desc="Objects which representation on a map should be a point">
+				<class coarse="0" coarse_name="unclassified" id="302020100" en="other punctual" fr="autre ponctuel" desc="Punctual static objects that do not fit in one of the following categories"></class>
+				<class coarse="3" coarse_name="signage" id="302020200" en="post" fr="poteau" desc="Higher than 1m"></class>
+				<class coarse="4" coarse_name="bollard" id="302020300" en="bollard" fr="potelet" desc="Lower than 1m"></class>
+				<class coarse="3" coarse_name="signage" id="302020400" en="floor lamp" fr="lampadaire" desc=""></class>
+				<class coarse="3" coarse_name="signage" id="302020500" en="traffic light" fr="feu rouge" desc=""></class>
+				<class coarse="3" coarse_name="signage" id="302020600" en="traffic sign" fr="panneau de circulation" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="302020700" en="signboard" fr="panneau publicitaire" desc="All signs off building except traffic signs"></class>
+				<class coarse="0" coarse_name="unclassified" id="302020800" en="mailbox" fr="boite aux lettres" desc=""></class>
+				<class coarse="5" coarse_name="trash_can" id="302020900" en="trash can" fr="poubelle" desc="Only fixed"></class>
+				<class coarse="0" coarse_name="unclassified" id="302021000" en="meter" fr="parcmètre" desc="Where you pay for parking"></class>
+				<class coarse="0" coarse_name="unclassified" id="302021100" en="bicycle terminal" fr="borne pour vélo" desc="Structures to park bikes in free access"></class>
+				<class coarse="0" coarse_name="unclassified" id="302021200" en="bicycle rack" fr="porte vélo" desc="Structures to park and lock bikes"></class>
+				<class coarse="0" coarse_name="unclassified" id="302021300" en="statue" fr="statue" desc=""></class>
+			</class>
+			<class coarse="0" coarse_name="unclassified" id="302030000" en="linear" fr="linéaire" desc="Objects which representation on a map should be a line">
+				<class coarse="0" coarse_name="unclassified" id="302030100" en="other linear" fr="autre linéaire" desc="Linear static objects that do not fit in one of the following categories"></class>
+				<class coarse="6" coarse_name="barrier" id="302030200" en="barrier" fr="barrière" desc=""></class>
+				<class coarse="6" coarse_name="barrier" id="302030300" en="roasting" fr="grillage" desc=""></class>
+				<class coarse="6" coarse_name="barrier" id="302030400" en="grid" fr="grille" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="302030500" en="chain" fr="chaine" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="302030600" en="wire" fr="fil électrique" desc=""></class>
+				<class coarse="6" coarse_name="barrier" id="302030700" en="low wall" fr="muret" desc="Not part of a building"></class>
+			</class>
+			<class coarse="0" coarse_name="unclassified" id="302040000" en="extended" fr="étendus" desc="Objects which representation on a map should be a polygon">
+				<class coarse="0" coarse_name="unclassified" id="302040100" en="other extended" fr="autre étendu" desc="Extended static objects that do not fit in one of the following categories"></class>
+				<class coarse="0" coarse_name="unclassified" id="302040200" en="shelter" fr="abribus" desc="Objects sheltering people waiting for the bus"></class>
+				<class coarse="0" coarse_name="unclassified" id="302040300" en="kiosk" fr="kiosque" desc="Small commercial constructions"></class>
+				<class coarse="0" coarse_name="unclassified" id="302040400" en="scaffolding" fr="échafaudage" desc="Temporary constructions along buildings"></class>
+				<class coarse="0" coarse_name="unclassified" id="302040500" en="bench" fr="banc" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="302040600" en="distribution box" fr="coffret de distribution" desc="distribution of electricity or gaz for example"></class>
+				<class coarse="2" coarse_name="building" id="302040700" en="lighting console" fr="console d'éclairage" desc="street lighting protruding from the facade of buildings"></class>
+				<class coarse="0" coarse_name="unclassified" id="302040800" en="windmill" fr="moulin" desc=""></class>
+			</class>
+		</class>
+	 
+		<class coarse="0" coarse_name="unclassified" id="303000000" en="Dynamic" fr="dynamiques" desc="Objects that can move easily">
+			
+			<class coarse="0" coarse_name="unclassified" id="303010000" en="other dynamic" fr="autre dynamique" desc="Dynamic objects that do not fit in one of the following categories"></class>
+			
+			<class coarse="7" coarse_name="pedestrian" id="303020000" en="pedestrian" fr="piéton" desc="">
+				<class coarse="7" coarse_name="pedestrian" id="303020100" en="other pedestrian" fr="autre piéton" desc="Pedestrians objects that do not fit in one of the following categories"></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020200" en="still pedestrian" fr="piéton immobile" desc=""></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020300" en="walking pedestrian" fr="piéton en marche" desc=""></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020400" en="running pedestrian" fr="piéton en course" desc=""></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020500" en="stroller pedestrian" fr="piéton avec poussette" desc="Pedestrian pushing any object with wheels"></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020600" en="holding pedestrian" fr="piéton en portant/tenant un objet" desc="Pedestrian lifting a large object (bag, suitcase, ...)"></class>
+				<class coarse="0" coarse_name="unclassified" id="303020700" en="leaning pedestrian" fr="piéton en appui sur un objet" desc="Leaning on wall, bench, post, ..."></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020800" en="skater" fr="piéton en skate" desc=""></class>
+				<class coarse="7" coarse_name="pedestrian" id="303020900" en="rollerskater" fr="piéton en roller" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="303021000" en="wheelchair" fr="PMR" desc=""></class>
+			</class>
+			
+			<class coarse="0" coarse_name="unclassified" id="303030000" en="2 wheelers" fr="2 roues" desc="">
+				<class coarse="0" coarse_name="unclassified" id="303030100" en="other 2 wheels" fr="autre 2 roues" desc="2 wheelers that do not fit in one of the following categories"></class>
+				<class coarse="0" coarse_name="unclassified" id="303030200" en="bicycle" fr="vélo" desc="">
+					<class coarse="0" coarse_name="unclassified" id="303030201" en="other bicycle" fr="autre vélo" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030202" en="mobile bicycle" fr="vélo mobile" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030203" en="stopped bicycle" fr="vélo avec cycliste" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030204" en="parked bicycle" fr="vélo garé" desc=""></class>
+				</class>
+				<class coarse="0" coarse_name="unclassified" id="303030300" en="scooter" fr="scooter" desc="">
+					<class coarse="0" coarse_name="unclassified" id="303030301" en="other scooter" fr="autre scooter" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030302" en="mobile scooter" fr="scooter mobile" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030303" en="stopped scooter" fr="scooter à l'arrêt" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030304" en="parked scooter" fr="scooter garé" desc=""></class>
+				</class>
+				<class coarse="0" coarse_name="unclassified" id="303030400" en="moped" fr="mobylette" desc="">
+					<class coarse="0" coarse_name="unclassified" id="303030401" en="other moped" fr="autre mobylette" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030402" en="mobile moped" fr="mobylette mobile" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030403" en="stopped moped" fr="mobylette à l'arrêt" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030404" en="parked moped" fr="mobylette garée" desc=""></class>
+				</class>
+				<class coarse="0" coarse_name="unclassified" id="303030500" en="motorbike" fr="moto" desc="">
+					<class coarse="0" coarse_name="unclassified" id="303030501" en="other motorbike" fr="autre moto" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030502" en="mobile motorbike" fr="moto mobile" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030503" en="stopped motorbike" fr="moto à l'arrêt" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303030504" en="parked motorbike" fr="moto garée" desc=""></class>
+				</class>
+			</class>
+			
+			<class coarse="0" coarse_name="unclassified" id="303040000" en="4+ wheelers" fr="4+ roues" desc="Vehicles with 4 or more wheels">
+				<class coarse="0" coarse_name="unclassified" id="303040100" en="other 4+ wheels" fr="autre 4+ roues" desc="4+ wheelers that do not fit in one of the following categories"></class>
+				<class coarse="8" coarse_name="car" id="303040200" en="car" fr="voiture" desc="">
+					<class coarse="8" coarse_name="car" id="303040201" en="other car" fr="autre voiture" desc=""></class>
+					<class coarse="8" coarse_name="car" id="303040202" en="mobile car" fr="voiture mobile" desc=""></class>
+					<class coarse="8" coarse_name="car" id="303040203" en="stopped car" fr="voiture à l'arrêt" desc=""></class>
+					<class coarse="8" coarse_name="car" id="303040204" en="parked car" fr="voiture garée" desc=""></class>
+				</class>
+				<class coarse="8" coarse_name="car" id="303040300" en="van" fr="camionnette" desc="With cabin and Cargo in the same structure">
+					<class coarse="8" coarse_name="car" id="303040301" en="other van" fr="autre camionnette" desc=""></class>
+					<class coarse="8" coarse_name="car" id="303040302" en="mobile van" fr="camionnette mobile" desc=""></class>
+					<class coarse="8" coarse_name="car" id="303040303" en="stopped van" fr="camionnette à l'arrêt" desc=""></class>
+					<class coarse="8" coarse_name="car" id="303040304" en="parked van" fr="camionnette garée" desc=""></class>
+				</class>
+				<class coarse="0" coarse_name="unclassified" id="303040400" en="truck" fr="camion" desc="With cabin separated from cargo">
+					<class coarse="0" coarse_name="unclassified" id="303040401" en="other truck" fr="autre camion" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303040402" en="mobile truck" fr="camion mobile" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303040403" en="stopped truck" fr="camion à l'arrêt" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303040404" en="parked truck" fr="camion garé" desc=""></class>
+				</class>
+				<class coarse="0" coarse_name="unclassified" id="303040500" en="bus" fr="bus" desc="Public transportation or tourist bus">
+					<class coarse="0" coarse_name="unclassified" id="303040501" en="other bus" fr="autre bus" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303040502" en="mobile bus" fr="bus mobile" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303040503" en="stopped bus" fr="bus à l'arrêt" desc=""></class>
+					<class coarse="0" coarse_name="unclassified" id="303040504" en="parked bus" fr="bus garé" desc=""></class>
+				</class>
+			</class>
+			
+			<class coarse="0" coarse_name="unclassified" id="303050000" en="furniture" fr="mobilier" desc="Objects leaning on the sidewalk">
+				<class coarse="0" coarse_name="unclassified" id="303050100" en="other furniture" fr="autre mobilier" desc="Furniture that do not fit in one of the following categories"></class>
+				<class coarse="0" coarse_name="unclassified" id="303050200" en="table" fr="table" desc="From bars, restaurants,..."></class>
+				<class coarse="0" coarse_name="unclassified" id="303050300" en="chair" fr="chaise" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="303050400" en="stool" fr="tabouret" desc=""></class>
+				<class coarse="0" coarse_name="unclassified" id="303050500" en="trash can" fr="poubelle" desc="By opposition with fixed ones"></class>
+				<class coarse="0" coarse_name="unclassified" id="303050600" en="waste" fr="déchet" desc="Not yet disposed of"></class>
+			</class>
+		</class>
+	
+		<class coarse="9" coarse_name="vegetation" id="304000000" en="natural" fr="naturel" desc="Natural objects">
+			<class coarse="9" coarse_name="vegetation" id="304010000" en="other natural" fr="autre naturel" desc="Natural objects that do not fit in one of the following categories"></class>
+			<class coarse="9" coarse_name="vegetation" id="304020000" en="tree" fr="arbre" desc="With visible trunk"></class>
+			<class coarse="9" coarse_name="vegetation" id="304030000" en="bush" fr="buisson" desc="Trunk not visible"></class>
+			<class coarse="0" coarse_name="unclassified" id="304040000" en="potted plant" fr="plante en pot" desc="With visible pot"></class>
+			<class coarse="0" coarse_name="unclassified" id="304050000" en="hedge" fr="haie" desc="All series of natural objects that cannot be separted visually"></class>
+		</class>
+	
+	 </class>
+	</classes> 
+	

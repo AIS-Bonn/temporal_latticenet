@@ -1,0 +1,15 @@
+*__pycache__*
+.vscode*
+*.zip
+verbose/
+lattice_net/build/*
+lattice_net/latticenet.cpython-36m-x86_64-linux-gnu.so
+lattice_net/latticenet.egg-info/*
+lattice_net/liblatticenet_cu.so
+testing.py
+imgui.ini
+OldFiles*
+predictions/
+recordings/
+kpconv_pred/
+solid_gt_predictions/
