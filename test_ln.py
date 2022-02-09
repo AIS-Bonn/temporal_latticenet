@@ -63,13 +63,12 @@ def create_loader(dataset_name, config_parser, sequence_learning = False, shuffl
 def run(dataset_name = "semantickitti"):
     if dataset_name == "semantickitti":
         print("\n-------- Using SemanticKitti Dataset --------")
-        #config_file="/media/rosu/Data/phd/c_ws/src/schuett_temporal_lattice/lattice_net/config/lnn_train_semantic_kitti radu..cfg"
-        config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_eval_semantic_kitti.cfg"
+        config_file="/workspace/temporal_latticenet/seq_config/lnn_eval_semantic_kitti.cfg"
         print("Config file: ", config_file)
     elif(dataset_name=="parislille"):
         sys.exit("Currently ParisLille3D isn't supported!")
         print("\n-------- Using ParisLille3D Dataset --------")
-        config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_eval_paris_lille.cfg"
+        config_file="/workspace/temporal_latticenet/seq_config/lnn_eval_paris_lille.cfg"
     else:
         sys.exit("Dataset name not recognized. It is {}. Available options are semantickitti or parislille.".format(dataset_name) )
 
@@ -232,18 +231,18 @@ def run(dataset_name = "semantickitti"):
                            
 
                             ################################################################################
-                            ##############IMPORTANT################
+                            ##############IMPORTANT for competition################
                             #after running this test.py script and getting all the .label files. You need to run the remap_semantic_labels from https://github.com/PRBonn/semantic-kitti-api/
                             # you need to run with the --inverse flag and the correct .config (depending if you use 20 classes or 26 classes with the moving objects) in order to get the original labels and only then you can upload to the codalab server
                             #example: 
                             # ./remap_semantic_labels.py --predictions /media/rosu/Data/data/semantic_kitti/predictions/motion_seg --split test --datacfg config/semantic-kitti-all.yaml --inverse
-                            # 26: ./remap_semantic_labels.py --predictions ../schuett_temporal_lattice/predictions/tests/ --split valid --datacfg config/semantic-kitti-all.yaml --inverse
+                            # 26: ./remap_semantic_labels.py --predictions ../temporal_latticenet/predictions/tests/ --split valid --datacfg config/semantic-kitti-all.yaml --inverse
                             # in remap: label = np.fromfile(label_file, dtype=np.uint32, sep = "\n")
                             # ./validate_submission.py --task segmentation /media/rosu/Data/data/semantic_kitti/for_server/big_network_early_linear_cloud_nr_3_scope_1/motion_seg_remapped.zip /media/rosu/Data/data/kitti/data_odometry_velodyne/dataset 
 
                             #to validate on the valid set 
                             # ./evaluate_semantics.py --dataset /media/rosu/Data/data/kitti/data_odometry_velodyne/dataset  --predictions /media/rosu/Data/data/semantic_kitti/predictions/motion_seg_validation --split valid
-                            # 26: ./evaluate_semantics.py --dataset ../semantic_kitti/dataset/ --predictions ../schuett_temporal_lattice/predictions/tests/ --split valid -dc config/semantic-kitti-all.yaml
+                            # 26: ./evaluate_semantics.py --dataset ../semantic_kitti/dataset/ --predictions ../temporal_latticenet/predictions/tests/ --split valid -dc config/semantic-kitti-all.yaml
                             ################################################################################
 
 

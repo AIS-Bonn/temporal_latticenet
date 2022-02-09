@@ -38,7 +38,6 @@ class SemanticKittiDataset(torch.utils.data.Dataset):
         DATA = yaml.safe_load(open(yaml_config, 'r'))        
         self.split_seqs = DATA["split"]
         self.split_lengths = DATA["split_lengths"]
-        self.synthkitti = loader_config["synthkitti"]
 
         class_remap = DATA["learning_map"]
         # make lookup table for mapping
@@ -83,17 +82,11 @@ class SemanticKittiDataset(torch.utils.data.Dataset):
             if self.split == "train":
                 print("------------------- DEBUGGING DATALOADER -------------------")
             self.dataset_size = 1
-        elif self.synthkitti:
-            if self.split == "train":
-                print("------------------- SYNTHETIC SET -------------------")
-            self.dataset_size = 1
 
     def __len__(self):
         return self.dataset_size
 
     def __getitem__(self, index):
-        if self.synthkitti:
-            return self.__getSynthitem__(index)
 
         if self.debug_loader:
             index = 4541 + 1101+4661+801+200 # needs to be rather small for the val set to work
@@ -206,82 +199,6 @@ class SemanticKittiDataset(torch.utils.data.Dataset):
             return scan_seq, feature_seq, label_seq, path_seq, len_seq
         else:
             return torch.cat(scan_seq), torch.cat(feature_seq), torch.cat(label_seq), path_seq, len_seq
-
-
-    # return a sequence of length self.frame_num that uses the same cloud and adds a moving car to the scene   
-    def __getSynthitem__(self, index):
-        scan_seq, feature_seq, label_seq, path_seq = [],[],[],[]
-        index = 1
-        indeces = np.zeros(self.frame_num, dtype = np.int)
-
-        real_indeces = None
-        dataset_idx = None
-        seq = None
-
-        cum_lengths = np.cumsum(self.dataset_lengths)
-        last_cumsum = 0
-
-        for i, cumsum in enumerate(cum_lengths):
-            if index < cumsum:
-                seq = int(self.split_seqs[self.split][i])
-                real_idx = index - last_cumsum # if last_cumsum != 0 else index
-
-                dataset_idx = i
-                real_indeces = np.maximum(indeces + real_idx, 0)
-                break
-            last_cumsum = cumsum
-
-        for i in range(0, real_indeces.shape[0]):
-            idx = real_indeces[i]
-            scan, label, feature = None, None, None
-
-            filename = os.path.join(self.data_dir,'sequences', '{:02d}'.format(seq), 'velodyne', '{:06d}.bin'.format(idx))
-            assert(os.path.isfile(filename)), str("Filename not found: ", filename)
-            
-            scan_xyzref = np.fromfile(filename, dtype=np.float32).reshape(-1,4).transpose()
-            label = load_label(seq, idx, self.remap_lut, dir = self.data_dir)
-            label[label == 20] = 1 # we have only this static cloud, therefore all possible other "moving cars" are static
-
-            scan_xyz = scan_xyzref[0:3,:]
-            label = np.squeeze(label, axis = 1)  
-
-            scan_xyz_homogenous = np.ones((4, scan_xyz.shape[1]))
-            scan_xyz_homogenous[0:3,:] = scan_xyz    
-
-            scan = np.matmul(rotation_matrix(-90, "x"), scan_xyz_homogenous)# angle 1.0
-            scan = scan[0:3,:].transpose()  # shape has to be [i,3]
-
-            # add the car to the scene
-            car=Mesh("/workspace/schuett_temporal_lattice/visualization_assets/car_passat.ply")
-            car_vertices = random_subsample(cloud = car.V, percentage_removal = 0.4)
-            r = R.from_euler('z', 90, degrees=True)
-            car_vertices = r.apply(car_vertices)
-            r = R.from_euler('x', -90, degrees=True)
-            car_vertices = r.apply(car_vertices)
-            car_vertices += np.array([0,-0.8,0]) # shift car onto road
-            car_vertices += np.array([18 - i*3.5,0,0]) # to create a "driving car" scenario the car model has to move
-
-            scan = np.append(scan, car_vertices, axis = 0)
-            label = np.append(label, np.ones((car_vertices.shape[0],))*20, axis = 0) #moving cars have label 20
-            feature = np.ones((label.shape[0],1), dtype = float)
-
-            if self.shuffle_points:
-                randomize = np.arange(scan.shape[0])
-                np.random.shuffle(randomize)
-                scan = scan[randomize,:]
-                label = label[randomize]
-
-            #print(label)
-            label = torch.tensor(label, dtype = torch.long)
-            feature = torch.tensor(feature, dtype = torch.float)
-
-            scan_seq.append(scan)
-            label_seq.append(label)
-            path_seq.append(filename)
-            feature_seq.append(feature)
-
-        scan_seq = self.transformer.transform(scan_seq)
-        return scan_seq, feature_seq, label_seq, path_seq, _
 
 
 

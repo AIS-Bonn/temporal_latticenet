@@ -9,8 +9,8 @@ import torch
 
 import sys, os, argparse, time
 from tqdm import tqdm
-print(time.asctime())
-print("PID: ", os.getpid()) # you can use any application to remind you if the script breaks by checking for this PID
+#print(time.asctime())
+#print("PID: ", os.getpid()) # you can use any application to remind you if the script breaks by checking for this PID
 
 from dataloader.kitti_dataloader import *
 from dataloader.parisLille_dataloader import *
@@ -59,15 +59,16 @@ def create_loader(dataset_name, config_parser, sequence_learning = False, shuffl
 
 
 def run(dataset_name = "semantickitti"):
+    cwd = os.getcwd()
     if dataset_name == "semantickitti":
         print("\n-------- Using SemanticKitti Dataset --------")
         #config_file="/media/rosu/Data/phd/c_ws/src/schuett_temporal_lattice/lattice_net/config/lnn_train_semantic_kitti radu..cfg"
-        config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_train_semantic_kitti.cfg"
+        config_file=cwd+"/seq_config/lnn_train_semantic_kitti.cfg"
         print("Config file: ", config_file)
     elif(dataset_name=="parislille"):
         sys.exit("Currently ParisLille3D isn't supported!")
         print("\n-------- Using ParisLille3D Dataset --------")
-        config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_train_paris_lille.cfg"
+        config_file=cwd+"/seq_config/lnn_train_paris_lille.cfg"
     else:
         sys.exit("Dataset name not recognized. It is {}. Available options are semantickitti or parislille.".format(dataset_name) )
 

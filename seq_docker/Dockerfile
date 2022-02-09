@@ -22,6 +22,7 @@ RUN chmod +x ./cleanup.sh
 # Basic Utilities (dirmngr and gpg-agent is needed so that apt-get adv works)
 RUN apt-get -y update && apt-get install -y --no-install-recommends sudo ssh tmux git meld cmake cmake-curses-gui htop vim iputils-ping apt-utils apt-transport-https software-properties-common wget build-essential gdb valgrind silversearcher-ag curl dirmngr gpg-agent checkinstall locate baobab ninja-build libncurses5-dev pkg-config && sh "./cleanup.sh"
 
+#Make SSH keys work inside the container
 RUN  echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
 RUN  echo "    IdentityFile ~/.ssh/id_ed25519" >> /etc/ssh/ssh_config
 
@@ -33,7 +34,6 @@ RUN chmod +x ./cleanup.sh
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends python3-dev python3-pip python3-setuptools && sh "./cleanup.sh"
 
 #switch to python3  https://linuxconfig.org/how-to-change-from-default-to-alternative-python-version-on-debian-linux
-#this is needed so that catkin uses python3 and therefore pybind uses python3 which is the only one that can use spconv..
 RUN sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.6 2
 
 #packages that were previously installed by ros but now we need the expliticly
@@ -43,9 +43,9 @@ RUN sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y instal
 #GRAPHICS STUFF
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends libglfw3-dev && sh "./cleanup.sh"
 
-RUN wget http://mirrors.edge.kernel.org/ubuntu/pool/universe/e/eigen3/libeigen3-dev_3.3.7-2_all.deb
-RUN sudo dpkg -i libeigen3-dev_3.3.7-2_all.deb
-RUN rm libeigen3-dev_3.3.7-2_all.deb
+#Halide requires also Eigen but there is an issue when compiling cuda10 and eigen, solution is to upgrade eigen https://github.com/tensorflow/tensorflow/issues/15389
+COPY data/libeigen3-dev_3.3.7-3_all.deb ./
+RUN sudo dpkg -i libeigen3-dev_3.3.7-3_all.deb
 
 #pytorch
 WORKDIR /
