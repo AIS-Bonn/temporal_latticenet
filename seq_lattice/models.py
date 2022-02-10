@@ -44,7 +44,7 @@ class LNN_SEQ(torch.nn.Module):
         self.first_sequence = True # in the first sequence we want to reset the hashmap and save the current state without any modifications as the hidden state
         self.rnn_modules = [x.lower() for x in model_config["rnn_modules"]]
         for i in range(0,len(self.rnn_modules)):
-            if self.rnn_modules[i] not in ["linear","maxpool","cga","cli","lstm","gru"]:
+            if self.rnn_modules[i] not in ["linear","maxpool","cga","aflow","lstm","gru"]:
                 self.rnn_modules[i] = "none" 
         print("Fusion Modules: ",self.rnn_modules) if not loader_config["accumulate_clouds"] else print("Accumulating all clouds!")
         assert(self.rnn_modules.count("none") < len(self.rnn_modules)), "If sequence_learning = True the rnn_modules can not all be none."
@@ -102,15 +102,15 @@ class LNN_SEQ(torch.nn.Module):
                 print("adding Late_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
             self.late_GRU = GRUModule(model_params.pointnet_start_nr_channels()*3)
 
-            if (self.sequence_learning) and (self.rnn_modules[1] == "cli"):
-                print("adding Middle_CLI Module with nr_output_channels ", model_params.pointnet_start_nr_channels())
-            self.middle_CLI = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels())
-            if (self.sequence_learning) and (self.rnn_modules[2] == "cli"):
-                print("adding Bottleneck_CLI Module with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
-            self.CLI = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*4)
-            if (self.sequence_learning) and (self.rnn_modules[3] == "cli"):
-                print("adding LATE_CLI Module with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
-            self.late_CLI = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*3)
+            if (self.sequence_learning) and (self.rnn_modules[1] == "aflow"):
+                print("adding Middle_AFLOW Module with nr_output_channels ", model_params.pointnet_start_nr_channels())
+            self.middle_AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels())
+            if (self.sequence_learning) and (self.rnn_modules[2] == "aflow"):
+                print("adding Bottleneck_AFLOW Module with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
+            self.AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*4)
+            if (self.sequence_learning) and (self.rnn_modules[3] == "aflow"):
+                print("adding LATE_AFLOW Module with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
+            self.late_AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*3)
 
 
         #####################
@@ -226,12 +226,12 @@ class LNN_SEQ(torch.nn.Module):
             self.late_LSTM.reset_sequence()
             self.middle_GRU.reset_sequence()
             self.late_GRU.reset_sequence()
-            self.CLI.reset_sequence()
-            self.middle_CLI.reset_sequence()
-            self.late_CLI.reset_sequence()
+            self.AFLOW.reset_sequence()
+            self.middle_AFLOW.reset_sequence()
+            self.late_AFLOW.reset_sequence()
 
 
-    def forward(self, ls, positions, values, early_return = False, with_gradient = True, vis_cli = False):
+    def forward(self, ls, positions, values, early_return = False, with_gradient = True, vis_aflow = False):
         # ls_deepcopy = None
         # we want to clear the hashmap  before we do t=0, because we want to get rid of the previous sequences hashmap
         reset_hashmap = True
@@ -285,8 +285,8 @@ class LNN_SEQ(torch.nn.Module):
                         lv, ls = self.middle_GRU(lv,ls)
                     if(self.rnn_modules[1] == "cga"):
                         lv, ls = self.middle_CGA(lv,ls)
-                    if(self.rnn_modules[1] == "cli"):
-                        lv, ls = self.middle_CLI(lv,ls)
+                    if(self.rnn_modules[1] == "aflow"):
+                        lv, ls = self.middle_AFLOW(lv,ls)
 
                 #print("middle: ", lv.shape)
 
@@ -309,8 +309,8 @@ class LNN_SEQ(torch.nn.Module):
             # print("bottleneck stage", j,  "lv has shape", lv.shape, "ls has val_dim", ls.val_dim()  )
             lv, ls = self.resnet_blocks_bottleneck[j] ( lv, ls) 
             
-        if (self.sequence_learning) and (self.rnn_modules[2] == "cli"):
-            lv,ls = self.CLI(lv,ls)
+        if (self.sequence_learning) and (self.rnn_modules[2] == "aflow"):
+            lv,ls = self.AFLOW(lv,ls)
         #print("bottle: ", lv.shape)
         
         # we need to do this, because the ls has to be reset to the correct structure in the first dimension
@@ -348,8 +348,8 @@ class LNN_SEQ(torch.nn.Module):
                             lv, ls = self.late_GRU(lv,ls)
                         if(self.rnn_modules[3] == "cga"):
                             lv, ls = self.late_CGA(lv,ls)
-                        if(self.rnn_modules[3] == "cli"):
-                            lv, ls = self.late_CLI(lv,ls)
+                        if(self.rnn_modules[3] == "aflow"):
+                            lv, ls = self.late_AFLOW(lv,ls)
                     #print("late: ", lv.shape)
 
                     if (early_return) and (self.sequence_learning):
@@ -367,9 +367,9 @@ class LNN_SEQ(torch.nn.Module):
         # TIME_END("up_path")
 
 
-        if vis_cli:
+        if vis_aflow:
             #print("hi")
-            h_lv_vis, weights_vis, lattice_neighbors_previous_index = self.late_CLI.return_for_vis()
+            h_lv_vis, weights_vis, lattice_neighbors_previous_index = self.late_AFLOW.return_for_vis()
             
             if weights_vis is not None:
                 lattice_neighbors_previous_index = lattice_neighbors_previous_index
@@ -405,7 +405,7 @@ class LNN_SEQ(torch.nn.Module):
         # return logsoftmax, s_final
 
 
-    def visualize_the_cli_module(self):
+    def visualize_the_aflow_module(self):
         return self.lattice_neighbors_previous_index_list, self.avg_position_per_vertex_list, self.weight_vis_list
 
     def prepare_cloud(self, cloud):

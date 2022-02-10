@@ -191,7 +191,7 @@ class CrossframeLocalInterpolationModule(torch.nn.Module):
         self.h_lv = None
         
         self.nr_output_channels = nr_output_channels
-        self.CLI = CustomKernelConvLatticeIm2RowModule(nr_filters=nr_output_channels)
+        self.AFLOW = CustomKernelConvLatticeIm2RowModule(nr_filters=nr_output_channels)
         self.relu=torch.nn.ReLU(inplace=False)
         self.linear = torch.nn.Linear(self.nr_output_channels*2,self.nr_output_channels)
 
@@ -214,13 +214,13 @@ class CrossframeLocalInterpolationModule(torch.nn.Module):
             # we pad with -999999, because the difference between vectors in feature space is calculated and -999999 gives a quite high distance (therefore a small weight)
             h_lv_padded = torch.nn.functional.pad(self.h_lv, (0,0,0,padding_amount), value=-999999 ) 
 
-            #print("Hidden CLI ---: ", h_lv_padded)
-            CLI_feature_vec, weights, lattice_neighbors_previous = self.CLI(lv, h_lv_padded, ls)
+            #print("Hidden AFLOW ---: ", h_lv_padded)
+            AFLOW_feature_vec, weights, lattice_neighbors_previous = self.AFLOW(lv, h_lv_padded, ls)
             self.h_lv_vis, self.weights_vis, self.lattice_neighbors_previous = h_lv_padded.clone().detach(), weights.clone().detach(), lattice_neighbors_previous.clone().detach()
 
             # concat new feature with feature from lv
-            #print(torch.sum(CLI_feature_vec), " ", torch.sum(lv))
-            cat_tensors = torch.cat([CLI_feature_vec,lv],dim=1)
+            #print(torch.sum(AFLOW_feature_vec), " ", torch.sum(lv))
+            cat_tensors = torch.cat([AFLOW_feature_vec,lv],dim=1)
 
             # residual block to get a feature vector
             cat_tensors = self.linear(cat_tensors)
@@ -298,7 +298,7 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
         # x += 1 -> in-place https://discuss.pytorch.org/t/leaf-variable-was-used-in-an-inplace-operation/308
         # x = x+1 -> not in-place
 
-        CLI_lv = torch.zeros_like(lattice_values).to("cuda") 
+        AFLOW_lv = torch.zeros_like(lattice_values).to("cuda") 
         distances = torch.zeros((lattice_values.shape[0],9)).to("cuda")
         weights = torch.zeros((lattice_values.shape[0],9)).to("cuda")
         alpha_tensor = torch.ones_like(weights)*self.alpha
@@ -318,15 +318,15 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
         #print(weights)
 
         # 4) Weight all neighbors with their respective weights
-        CLI_lv[:,:] = CLI_lv[:,:] + torch.sum((lattice_neighbors_previous[:,:].reshape(lattice_values.shape[0],-1,self.nr_filters).permute(0,2,1))*(weights[:,:].unsqueeze(1).repeat_interleave(self.nr_filters,dim=1)), axis = 2)
+        AFLOW_lv[:,:] = AFLOW_lv[:,:] + torch.sum((lattice_neighbors_previous[:,:].reshape(lattice_values.shape[0],-1,self.nr_filters).permute(0,2,1))*(weights[:,:].unsqueeze(1).repeat_interleave(self.nr_filters,dim=1)), axis = 2)
         
         if self.use_bias:
-            CLI_lv+=self.bias
+            AFLOW_lv+=self.bias
         #print("Alpha: ", self.alpha, " Beta: ", self.beta)
 
-        # I do not do ls.set_values(CLI_lv), because I am only interested in the feature vector
+        # I do not do ls.set_values(AFLOW_lv), because I am only interested in the feature vector
         lattice_structure.set_values(lattice_values)
-        return CLI_lv, weights, lattice_neighbors_previous_index[:,::self.nr_filters]
+        return AFLOW_lv, weights, lattice_neighbors_previous_index[:,::self.nr_filters]
 
 
 
@@ -356,9 +356,9 @@ class PointNetSeqModule(torch.nn.Module):
         if (self.sequence_learning) and (rnn_modules[0]=="cga" ):
             print("adding Early_CGA with nr_output_channels ", self.nr_outputs_last_layer)
         self.CGA = CrossframeGlobalAttentionModule(self.nr_output_channels_per_layer[-1]*2)
-        if (self.sequence_learning) and (rnn_modules[0]=="cli" ):
-            print("adding Early_CLI with nr_output_channels ", self.nr_outputs_last_layer)
-        self.CLI = CrossframeLocalInterpolationModule( self.nr_output_channels_per_layer[-1]*2)
+        if (self.sequence_learning) and (rnn_modules[0]=="aflow" ):
+            print("adding Early_AFLOW with nr_output_channels ", self.nr_outputs_last_layer)
+        self.AFLOW = CrossframeLocalInterpolationModule( self.nr_output_channels_per_layer[-1]*2)
         if (self.sequence_learning) and (rnn_modules[0]=="lstm" ):
             print("adding Early_LSTM with nr_output_channels ", self.nr_outputs_last_layer)
         self.LSTM = LSTMModule(self.nr_output_channels_per_layer[-1]*2)
@@ -383,7 +383,7 @@ class PointNetSeqModule(torch.nn.Module):
         self.CGA.reset_sequence()
         self.LSTM.reset_sequence()
         self.GRU.reset_sequence()
-        self.CLI.reset_sequence()
+        self.AFLOW.reset_sequence()
         self.h_lv = None
 
     def forward(self, lattice_py, distributed, indices):
@@ -531,8 +531,8 @@ class PointNetSeqModule(torch.nn.Module):
             distributed_reduced, lattice_py = self.GRU(distributed_reduced, lattice_py)
         if(self.rnn_modules[0] == "cga"):
             distributed_reduced, lattice_py = self.CGA(distributed_reduced, lattice_py)
-        if(self.rnn_modules[0] == "cli"):
-            distributed_reduced, lattice_py = self.CLI(distributed_reduced, lattice_py)
+        if(self.rnn_modules[0] == "aflow"):
+            distributed_reduced, lattice_py = self.AFLOW(distributed_reduced, lattice_py)
 
 
 
