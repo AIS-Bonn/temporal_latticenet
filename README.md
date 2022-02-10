@@ -1,8 +1,8 @@
 # Temporal LatticeNet
 
-<!-- [Project Page](https://www.ais.uni-bonn.de/videos/RSS_2020_Rosu/) | [Video](https://www.youtube.com/watch?v=503Z5Vw9a90) | [Paper](https://www.ais.uni-bonn.de/videos/RSS_2020_Rosu/RSS_2020_Rosu.pdf)-->
+[Project Page](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/) | [Video](https://www.youtube.com/watch?v=ljjMDkSLl0g) | [Paper](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/ICRA_2022_Schuett.pdf)
 
-[Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice](https://www.ais.uni-bonn.de/videos/RSS_2020_Rosu/)  
+[Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/)  
  [Peer Sch&uuml;tt](https://www.ais.uni-bonn.de/schuett/) <sup>1</sup>,
  [Radu Alexandru Rosu](https://www.ais.uni-bonn.de/%7Erosu/) <sup>1</sup>,
  [Sven Behnke](https://www.ais.uni-bonn.de/behnke/) <sup>1</sup>
@@ -14,7 +14,7 @@
   <img src="imgs/teaser.png" width="550" />
 </p>
 
-This is the official PyTorch implementation of [Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice](https://www.ais.uni-bonn.de/videos/RSS_2020_Rosu/).   
+This is the official PyTorch implementation of [Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/).   
 
 The implementation is written in CUDA and PyTorch. There is no CPU implementation yet.
 
