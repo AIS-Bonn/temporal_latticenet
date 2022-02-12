@@ -5,9 +5,8 @@ class cfgParser():
     def __init__(self, cfg_file):
 
         with open(cfg_file, 'r') as j:
-            print(j.read())
-            self.contents = hjson.loads(j.read(), encoding = "utf-8")
-
+            self.contents = hjson.loads(j.read())
+           
     # all getter functions return an OrderedDict
     def get_core_vars(self):
         return self.contents['core']
