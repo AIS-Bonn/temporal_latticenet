@@ -76,9 +76,9 @@ def run(dataset_name = "semantickitti"):
         sys.exit("The GPU is not available!")
 
     config_parser = cfgParser(config_file)
+    model_params=ModelParams.create(config_file)    
     model_config = config_parser.get_model_vars()
     eval_config = config_parser.get_eval_vars()
-    model_params=ModelParams.create(config_file)    
     loader_params = config_parser.get_loader_semantic_kitti_vars()
     label_mngr_params = config_parser.get_label_mngr_vars()
     lattice_gpu_config = config_parser.get_lattice_gpu_vars()
