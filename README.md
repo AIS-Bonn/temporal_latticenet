@@ -91,7 +91,7 @@ model: rnn_modules: ["gru", "gru", "cli", "cli"]
 AFlow can only be used for the last two fusion positions.
 Setting **accumulate_clouds: true** will accumulate all clouds of a sequence and use the original LatticeNet to predict the semantic segmentation. 
 
-## Train 
+## Training 
 
 LatticeNet uses config files to define the dataset parameters, the training parameters, model architecture and various visualization options.<br/>
 Running the training script will by default use the config file for the SemanticKITTI dataset (**lnn_train_semantic_kitti.cfg**) and start the training.
@@ -101,21 +101,26 @@ Training the network:
 $ python train_ln.py --dataset semantickitti
 ```
 
-## Test 
+## Evaluating 
 
 Testing works similar to the training. A major difference is, that we need to load a specific model that needs to be defined in the config file (e.g. **lnn_eval_semantic_kitti.cfg**):
 
 ```
 checkpoint_path: "/workspace/temporal_latticenet/pretrained_models"
-load_checkpoint_model: "model_moving_setKitti_sigma0.6_typelstm-lstm-cli-lstm_frames4_scope3_epoch_2.pt"
+load_checkpoint_model: "12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt"
 ``` 
 
-The network would now load the model **model_moving_setKitti_sigma0.6_typelstm-lstm-cli-lstm_frames4_scope3_epoch_2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*.
+The network would now load the pretrained model **12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*.
 
 Evaluating the network:
 ```sh
 $ python test_ln.py --dataset semantickitti
 ```
+
+### Create a submission for the SemanticKITTI competition website
+
+To create a valid submission for the SemanticKITTI competition website you have to follow the steps explained in *test_ln.py* in line 234 under the **IMPORTANT for competition** comment. Additionally, you need the scripts provided in the https://github.com/PRBonn/semantic-kitti-api repository. 
+
 
 ## Configuration options 
 
@@ -133,16 +138,11 @@ If training is performed with the viewer enabled, you should see something like 
 </p>
 
 
-## Create a submission for the SemanticKITTI competition website
+## Visualize the predictions
 
-To create a valid submission for the SemanticKITTI competition website you have to follow the steps explained in *test_ln.py* in line 234 under the **IMPORTANT for competition** comment. Additionally, you need the scripts provided in the https://github.com/PRBonn/semantic-kitti-api repository. 
+The predictions are provided as **.label** files for each cloud. These can be visualized using the **RecordPLYs.py** script, that uses **easy_pbr** to display the scenes. You can enable recording of images for each point cloud from the given camera pose using the **recorder** in the **RecordPLYs.py** script. You can view a wide variety of different clouds with this script, from ground truth segmentations and the network predictions to all clouds of a sequence in a common coordinate system.
 
-
-## Create a video from the predictions
-
-The predictions are provided as **.label** files for each cloud. These can be visualized using the **RecordPLYs.py** script. You can enable recording of images for each point cloud from the given camera pose using the **recorder** in the **RecordPLYs.py** script. You can view a wide variety of different clouds with this script, from ground truth segmentations and the network predictions to all clouds of a sequence in a common coordinate system.
-
-We provide a small script **create_movie.sh** with which you can generate an mp4-video from sequentially numbered images. For the script to work, you have to navigate to the folder, where the images are located and then call the script from there. It will then add all images in their numeric order to the video.  
+We provide a small script **create_movie.sh** with which you can generate a mp4-video from sequentially numbered images. For the script to work, you have to navigate to the folder, where the images are located and then call the script from there. It will then add all images in their numeric order to the video.  
 
 To view the colormap independently we created the file **Colorscheme.ods** for SemanticKITTI in the folder *colorscheme_and_labels/semantic-kitti*. We made minor changes to the original colormap provided by the SemanticKITTI competition, because the color of the classes other-vehicle and moving-car were too similar.
 
