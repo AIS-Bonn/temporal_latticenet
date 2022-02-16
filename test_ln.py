@@ -47,7 +47,8 @@ def write_gt(cloud, gt_path):
 # train_border and valid_border are integers
 def create_loader(dataset_name, config_parser, sequence_learning = False, shuffle = False, train_border = None, valid_border = None):
     if(dataset_name=="semantickitti"):
-        test_dataset = SemanticKittiDataset(split = "test", config_parser = config_parser, sequence_learning = sequence_learning)
+        # you can use split="test" for the test set and split="valid" for the validation set
+        test_dataset = SemanticKittiDataset(split = "valid", config_parser = config_parser, sequence_learning = sequence_learning)
     elif(dataset_name=="parislille"):
         test_dataset = ParisLille3DDataset(split = "test", config_parser = config_parser, sequence_learning = sequence_learning)
     else:
@@ -232,17 +233,18 @@ def run(dataset_name = "semantickitti"):
 
                             ################################################################################
                             ##############IMPORTANT for competition################
-                            #after running this test.py script and getting all the .label files. You need to run the remap_semantic_labels from https://github.com/PRBonn/semantic-kitti-api/
+                            #after running this test.py script and getting all the .label files. You need to run the scripts from https://github.com/PRBonn/semantic-kitti-api/
                             # you need to run with the --inverse flag and the correct .config (depending if you use 20 classes or 26 classes with the moving objects) in order to get the original labels and only then you can upload to the codalab server
-                            #example: 
-                            # ./remap_semantic_labels.py --predictions /media/rosu/Data/data/semantic_kitti/predictions/motion_seg --split test --datacfg config/semantic-kitti-all.yaml --inverse
-                            # 26: ./remap_semantic_labels.py --predictions ../temporal_latticenet/predictions/tests/ --split valid --datacfg config/semantic-kitti-all.yaml --inverse
-                            # in remap: label = np.fromfile(label_file, dtype=np.uint32, sep = "\n")
-                            # ./validate_submission.py --task segmentation /media/rosu/Data/data/semantic_kitti/for_server/big_network_early_linear_cloud_nr_3_scope_1/motion_seg_remapped.zip /media/rosu/Data/data/kitti/data_odometry_velodyne/dataset 
+                            # example for the test set with 26 classes: 
+                            # in remap you have to change: label = np.fromfile(label_file, dtype=np.uint32, sep = "\n")
+                            # ./remap_semantic_labels.py --predictions ../temporal_latticenet/predictions/ --split test --datacfg config/semantic-kitti-all.yaml --inverse
+                            # Now you have to zip your predictions into a file submission.zip:
+                            # zip -r ../temporal_latticenet/predictions/submission.zip ../temporal_latticenet/predictions/
+                            # ./validate_submission.py --task segmentation ../temporal_latticenet/predictions/submission.zip /workspace/Data/SemanticKitti/dataset/
 
-                            #to validate on the valid set 
-                            # ./evaluate_semantics.py --dataset /media/rosu/Data/data/kitti/data_odometry_velodyne/dataset  --predictions /media/rosu/Data/data/semantic_kitti/predictions/motion_seg_validation --split valid
-                            # 26: ./evaluate_semantics.py --dataset ../semantic_kitti/dataset/ --predictions ../temporal_latticenet/predictions/tests/ --split valid -dc config/semantic-kitti-all.yaml
+                            # to evaluate the valid set 
+                            # ./remap_semantic_labels.py --predictions ../temporal_latticenet/predictions/ --split valid --datacfg config/semantic-kitti-all.yaml --inverse
+                            # 26: ./evaluate_semantics.py --dataset /workspace/Data/SemanticKitti/dataset/  --predictions /workspace/temporal_latticenet/predictions/ --split valid -dc config/semantic-kitti-all.yaml
                             ################################################################################
 
 
