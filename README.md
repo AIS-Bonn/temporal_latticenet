@@ -110,7 +110,7 @@ checkpoint_path: "/workspace/temporal_latticenet/pretrained_models"
 load_checkpoint_model: "12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt"
 ``` 
 
-The network would now load the pretrained model **12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*.
+The network would now load the pretrained model **12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*. By default it will now evaluate all clouds that are part of the *test split* of SemanticKITTI. These are all clouds from the sequences 11 to 21. 
 
 Evaluating the network:
 ```sh
