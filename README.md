@@ -86,7 +86,7 @@ The bool **sequence_learning** defines if the network should use temporal depend
 Meanwhile **rnn_modules** is an array with four entries that defines the fusion modules at all possible positions. 
 The entries can be: Linear/MaxPool/CGA/AFlow/LSTM/GRU/None. An example configuration could be 
 ```
-model: rnn_modules: ["gru", "gru", "cli", "cli"]
+model: rnn_modules: ["gru", "gru", "aflow", "aflow"]
 ``` 
 AFlow can only be used for the last two fusion positions.
 Setting **accumulate_clouds: true** will accumulate all clouds of a sequence and use the original LatticeNet to predict the semantic segmentation. 
