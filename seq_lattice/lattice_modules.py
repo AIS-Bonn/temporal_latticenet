@@ -271,7 +271,8 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
 
 
     # hidden state is the already padded h^(t-1)
-    def forward(self, lattice_values, hidden_state, lattice_structure):
+    # use_center enables the use of the center vertex in addition to the one-hop neighborhood
+    def forward(self, lattice_values, hidden_state, lattice_structure, use_center=False):
 
         lattice_structure.set_values(lattice_values)
         filter_extent=lattice_structure.get_filter_extent(self.neighbourhood_size)
@@ -308,13 +309,13 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
         distances[:,:] = distances[:,:] + torch.cdist(x1 = lattice_neighbors_previous[:,:].reshape(lattice_values.shape[0],-1,self.nr_filters), x2=lattice_values[:,:].unsqueeze(1), p=2.0).squeeze(2)
         #distances[:,:] = distances[:,:] + torch.cdist(x1=lattice_values[:,:].unsqueeze(1), x2 = lattice_neighbors_previous[:,:].reshape(lattice_values.shape[0],-1,self.nr_filters)).squeeze(2)
         distances[:,:] = distances[:,:]* (lattice_neighbors_previous_index[:,::self.nr_filters] != -1)  # we dont want the feature vector of the <not found> neighbors. These are often written down as -1
-        distances[:,-1] = distances[:,-1]*0. # last element is the center vertex
+        distances[:,-1] = distances[:,-1] * float(use_center) # last element is the center vertex
         distances[:,:] = distances[:,:] * 1/(torch.sum(distances[:,:], dim = 1).unsqueeze(1).repeat_interleave(9,dim=1).detach()) # normalization
         
         # 3) Calc weights from distances
         weights[:,:] = weights[:,:] + (alpha_tensor - torch.min(distances[:,:], alpha_tensor))*self.beta 
         weights[:,:] = weights[:,:] * (lattice_neighbors_previous_index[:,::self.nr_filters] != -1)  # we dont want the feature vector of the <not found> neighbors
-        weights[:,-1] = weights[:,-1]*0. # last element is the center vertex
+        weights[:,-1] = weights[:,-1] * float(use_center) # last element is the center vertex
         #print(weights)
 
         # 4) Weight all neighbors with their respective weights
