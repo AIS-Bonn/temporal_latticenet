@@ -245,8 +245,10 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
         self.nr_filters=nr_filters
         self.dilation=dilation
         self.use_bias=bias
-        self.alpha = torch.tensor(0.1, requires_grad = True)
-        self.beta = torch.tensor(0.1, requires_grad = True)
+        #self.alpha = torch.tensor(0.1, requires_grad = True)
+        #self.beta = torch.tensor(0.1, requires_grad = True)
+        self.alpha = torch.nn.Parameter(data=torch.tensor(0.1), requires_grad=True)
+        self.beta = torch.nn.Parameter(data=torch.tensor(0.1), requires_grad=True)
         #self.alpha = 0.18 #0.4 # values from SpSequenceNet
         #self.beta = 0.5    # values from SpSequenceNet
         self.weights = None
@@ -272,7 +274,7 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
 
     # hidden state is the already padded h^(t-1)
     # use_center enables the use of the center vertex in addition to the one-hop neighborhood
-    def forward(self, lattice_values, hidden_state, lattice_structure, use_center=False):
+    def forward(self, lattice_values, hidden_state, lattice_structure, use_center=True):
 
         lattice_structure.set_values(lattice_values)
         filter_extent=lattice_structure.get_filter_extent(self.neighbourhood_size)
