@@ -64,7 +64,7 @@ $ ssh-add ~/.ssh/id_ed25519  # add the key to the ssh-agent
 ## Data
 
 
-Temporal LatticeNet uses point clouds for training. All clouds of a sequence need a common reference frame and therefore poses for each cloud are needed.         
+Temporal LatticeNet uses point clouds for training. All clouds of a sequence need a common reference frame, and therefore poses for each cloud are needed.         
 The clouds have to be placed into the folder, that can be linked using the *run.sh* script. They then appear in the docker under the path */workspace/Data/*.
 All available dataloaders for the datasets can be found in the folder **dataloader**. They are implemented according to the corresponding pytorch classes (https://pytorch.org/docs/stable/data.html). 
 
@@ -83,10 +83,10 @@ Currently only [SemanticKITTI](http://www.semantic-kitti.org/) is supported. All
 
 The config files (**.cfg**) in the folder *seq_config/* manage the different modes of the network. We have different ones for the training and testing.
 The bool **sequence_learning** defines if the network should use temporal dependencies or not. Setting it to *false* will run a basic LatticeNet that uses only the first cloud of the sequence.
-Meanwhile **rnn_modules** is an array with four entries that defines the fusion modules at all possible positions. 
+Meanwhile, **rnn_modules** is an array with four entries that defines the fusion modules at all possible positions. 
 The entries can be: Linear/MaxPool/CGA/AFlow/LSTM/GRU/None. An example configuration could be 
 ```
-model: rnn_modules: ["gru", "gru", "cli", "cli"]
+model: rnn_modules: ["gru", "gru", "aflow", "aflow"]
 ``` 
 AFlow can only be used for the last two fusion positions.
 Setting **accumulate_clouds: true** will accumulate all clouds of a sequence and use the original LatticeNet to predict the semantic segmentation. 
@@ -110,7 +110,7 @@ checkpoint_path: "/workspace/temporal_latticenet/pretrained_models"
 load_checkpoint_model: "12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt"
 ``` 
 
-The network would now load the pretrained model **12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*. By default it will now evaluate all clouds that are part of the *test split* of SemanticKITTI. These are all clouds from the sequences 11 to 21. 
+The network would now load the pretrained model **12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*. By default, it will now evaluate all clouds that are part of the *test split* of SemanticKITTI. These are all clouds from the sequences 11 to 21. 
 
 Evaluating the network:
 ```sh
@@ -119,7 +119,7 @@ $ python test_ln.py --dataset semantickitti
 
 ### Create a submission for the SemanticKITTI competition website
 
-To create a valid submission for the SemanticKITTI competition website you have to follow the steps explained in *test_ln.py* in line 234 under the **IMPORTANT for competition** comment. Additionally, you need the scripts provided in the https://github.com/PRBonn/semantic-kitti-api repository. 
+To create a valid submission for the SemanticKITTI competition website, you have to follow the steps explained in *test_ln.py* in line 234 under the **IMPORTANT for competition** comment. Additionally, you need the scripts provided in the https://github.com/PRBonn/semantic-kitti-api repository. 
 
 
 ## Configuration options 
@@ -142,9 +142,9 @@ If training is performed with the viewer enabled, you should see something like 
 
 The predictions are provided as **.label** files for each cloud. These can be visualized using the **RecordPLYs.py** script, that uses **easy_pbr** to display the scenes. You can enable recording of images for each point cloud from the given camera pose using the **recorder** in the **RecordPLYs.py** script. You can view a wide variety of different clouds with this script, from ground truth segmentations and the network predictions to all clouds of a sequence in a common coordinate system.
 
-We provide a small script **create_movie.sh** with which you can generate a mp4-video from sequentially numbered images. For the script to work, you have to navigate to the folder, where the images are located and then call the script from there. It will then add all images in their numeric order to the video.  
+We provide a small script **create_movie.sh** with which you can generate a mp4-video from sequentially numbered images. For the script to work, you have to navigate to the folder, where the images are located, and then call the script from there. It will then add all images in their numeric order to the video.  
 
-To view the colormap independently we created the file **Colorscheme.ods** for SemanticKITTI in the folder *colorscheme_and_labels/semantic-kitti*. We made minor changes to the original colormap provided by the SemanticKITTI competition, because the color of the classes other-vehicle and moving-car were too similar.
+To view the color map independently, we created the file **Colorscheme.ods** for SemanticKITTI in the folder *colorscheme_and_labels/semantic-kitti*. We made minor changes to the original colormap provided by the SemanticKITTI competition, because the color of the classes other-vehicle and moving-car were too similar.
 
 
 ## Citation
@@ -159,4 +159,4 @@ To view the colormap independently we created the file **Colorscheme.ods** for S
 ```
 
 # License
-Temporal LatticeNet is provided under the terms of the MIT license (see LICENSE). We bundle various other libraries which may have different licenses.
+Temporal LatticeNet is provided under the terms of the MIT license (see LICENSE). We bundle various other libraries, which may have different licenses.
