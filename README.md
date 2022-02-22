@@ -14,11 +14,11 @@
   <img src="imgs/teaser.png" width="550" />
 </p>
 
-This is the official PyTorch implementation of [Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/).   
+This is the official PyTorch implementation of ["Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice"](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/).   
 
 The implementation is written in CUDA and PyTorch. There is no CPU implementation yet.
 
-This repository is based on the lattice_net repository from Radu Alexandru Rosu: https://github.com/RaduAlexandru/lattice_net .
+This repository is based on the official [LatticeNet](http://www.ais.uni-bonn.de/videos/RSS_2020_Rosu/) implementation from Radu Alexandru Rosu: https://github.com/RaduAlexandru/lattice_net .
 
 
 # Getting started 
@@ -156,7 +156,6 @@ To view the colormap independently we created the file **Colorscheme.ods** for S
   booktitle="Proceedings of the IEEE International Conference on Robotics and Automation (ICRA)",
   year={2022}
 }
-
 ```
 
 # License
