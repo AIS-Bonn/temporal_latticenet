@@ -48,7 +48,7 @@ def write_gt(cloud, gt_path):
 def create_loader(dataset_name, config_parser, sequence_learning = False, shuffle = False, train_border = None, valid_border = None):
     if(dataset_name=="semantickitti"):
         # you can use split="test" for the test set and split="valid" for the validation set
-        test_dataset = SemanticKittiDataset(split = "valid", config_parser = config_parser, sequence_learning = sequence_learning)
+        test_dataset = SemanticKittiDataset(split = "test", config_parser = config_parser, sequence_learning = sequence_learning)
     elif(dataset_name=="parislille"):
         test_dataset = ParisLille3DDataset(split = "test", config_parser = config_parser, sequence_learning = sequence_learning)
     else:

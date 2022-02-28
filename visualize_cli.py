@@ -8,7 +8,7 @@ torch.manual_seed(100)
 
 with_viewer = True
 
-config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_train_semantic_kitti.cfg"
+config_file="/workspace/temporal_latticenet/seq_config/lnn_train_semantic_kitti.cfg"
 myview = None
 if with_viewer:
     myview=Viewer.create(config_file) #first because it needs to init context
@@ -57,11 +57,11 @@ def vis_CLI(dataset_name = "semantickitti"):
     if dataset_name == "semantickitti":
         print("######## Using SemanticKitti Dataset ########")
         #config_file="/media/rosu/Data/phd/c_ws/src/schuett_temporal_lattice/lattice_net/config/lnn_train_semantic_kitti radu..cfg"
-        config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_train_semantic_kitti.cfg"
+        config_file="/workspace/temporal_latticenet/seq_config/lnn_train_semantic_kitti.cfg"
         print(config_file)
     elif(dataset_name=="parislille"):
         print("######## Using ParisLille3D Dataset ########")
-        config_file="/workspace/schuett_temporal_lattice/seq_config/lnn_train_paris_lille.cfg"
+        config_file="/workspace/temporal_latticenet/seq_config/lnn_train_paris_lille.cfg"
         print(config_file)
     else:
         err="Dataset name not recognized. It is {}. Available options are semantickitti or parislille.".format(dataset_name) 
@@ -252,9 +252,9 @@ def vis_CLI(dataset_name = "semantickitti"):
                         target = target_seq[i].squeeze(0).to("cuda") 
 
                         #vis_cli = True #if i==(len(positions_seq)-1) else False
-                        pred_logsoftmax, pred_raw, lattice = model(lattice, positions, values, early_return = False, with_gradient = is_training, vis_cli = True) 
+                        pred_logsoftmax, pred_raw, lattice = model(lattice, positions, values, early_return = False, with_gradient = is_training, vis_aflow = True) 
                 
-                lattice_neighbors_previous_index_list, avg_position_per_vertex_list, weight_list = model.visualize_the_cli_module()
+                lattice_neighbors_previous_index_list, avg_position_per_vertex_list, weight_list = model.visualize_the_aflow_module()
                 prediction = torch.argmax(pred_logsoftmax, dim = 1).cpu()
                 positions = positions_seq[-1].squeeze(0).clone()
                 prediction_subsample = prediction.clone().numpy()
