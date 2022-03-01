@@ -53,8 +53,8 @@ class LNN_SEQ(torch.nn.Module):
         ######################
         # Dist. and PointNet #
         ######################  
-        self.distribute=DistributeLatticeModule()
-        self.pointnet_channels_per_layer=model_params.pointnet_channels_per_layer()
+        self.distribute=DistributeLatticeModule(experiment)
+        self.pointnet_channels_per_layer=model_params.pointnet_layers()
         self.start_nr_filters=model_params.pointnet_start_nr_channels()
         print("pointnt_channels_per_layer is ", self.pointnet_channels_per_layer)
 
