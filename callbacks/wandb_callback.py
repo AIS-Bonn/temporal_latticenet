@@ -1,6 +1,7 @@
 from callbacks.callback import *
 import wandb
 import hjson
+import numpy as np
 
 class WandBCallback(Callback):
 
@@ -12,18 +13,34 @@ class WandBCallback(Callback):
         # Before this init can be run, you have to use wandb login in the console you are starting the script from (https://docs.wandb.ai/ref/cli/wandb-login, https://docs.wandb.ai/ref/python/init)
         # entity= your username
         wandb.init(project=experiment_name, entity=entity,config = cfg)
+
+        # define our custom x axis metric
+        wandb.define_metric("train/step")
+        wandb.define_metric("valid/step")
+        # set all other train/ metrics to use this step
+        wandb.define_metric("train/*", step_metric="train/step")
+        wandb.define_metric("valid/*", step_metric="valid/step")
         
 
     def after_forward_pass(self, phase, loss, loss_dice, lr,**kwargs):
         # / act as seperators. If you would like to log train and test separately you would log test loss in test/loss 
-        wandb.log({'{}/loss'.format(phase.name): loss}, step=phase.iter_nr)
-        wandb.log({'{}/loss_dice'.format(phase.name): lr}, step=phase.iter_nr)
-        wandb.log({'{}/lr'.format(phase.name): lr}, step=phase.iter_nr)
+
+        log_dict = {
+            phase.name+"/loss": loss,
+            phase.name+"/loss_dice": loss_dice,
+            phase.name+"/lr": lr, 
+            phase.name+"/step": phase.iter_nr 
+        }
+        wandb.log(log_dict)
 
 
     def epoch_ended(self, phase, **kwargs):
         mean_iou=phase.scores.avg_class_iou(print_per_class_iou=False)
-        best_iou=phase.scores.best_iou
-        
-        wandb.log({'{}/mean_iou'.format(phase.name): mean_iou}, step=phase.epoch_nr)
-        wandb.log({'{}/best_iou'.format(phase.name): best_iou}, step=phase.epoch_nr)
+        best_iou=phase.scores.best_iou if phase.epoch_nr > 0 else 0
+
+        log_dict = {
+            phase.name+"/mean_iou": mean_iou,
+            phase.name+"/best_iou": best_iou,
+            phase.name+"/step": phase.iter_nr 
+        }
+        wandb.log(log_dict)

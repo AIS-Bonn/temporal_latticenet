@@ -9,6 +9,7 @@ lattice_net/liblatticenet_cu.so
 testing.py
 imgui.ini
 OldFiles*
+wandb/
 predictions/
 recordings/
 kpconv_pred/

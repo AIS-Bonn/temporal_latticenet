@@ -36,6 +36,7 @@ from datetime import datetime
 #torch.autograd.set_detect_anomaly(True)
 torch.set_printoptions(edgeitems=3)
 wandb_entity = "peerschuett"
+experiment_name = "temporal_latticenet_tests"
 
 # train_border and valid_border are integers, that define how many clouds are skipped, e.g. train_border = 6 means we start at the sixth cloud
 def create_loader(dataset_name, config_parser, sequence_learning = False, shuffle = False, train_border = None, valid_border = None):
@@ -92,17 +93,6 @@ def run(dataset_name = "semantickitti"):
         Path(train_config["checkpoint_path"]).mkdir(parents=True, exist_ok=True)
         print("The checkpoints will be saved to: ", str(train_config["checkpoint_path"]))
 
-    # initialize all callbacks
-    cb_list = []
-    if(train_config["with_visdom"]):
-        cb_list.append(VisdomCallback(None))
-    if(train_config["with_viewer"]):
-        cb_list.append(ViewerCallback())
-    if(train_config["with_wandb"]):
-        cb_list.append(WandBCallback(config_file,wandb_entity))
-    cb_list.append(StateCallback())
-    cb = CallbacksGroup(cb_list)
-
     # initialize the LabelMngr and the viewer
     m_ignore_index = label_mngr_params["unlabeled_idx"]
     labels_file=str(label_mngr_params["labels_file"])
@@ -112,7 +102,17 @@ def run(dataset_name = "semantickitti"):
     if train_config["with_viewer"]:
         view=Viewer.create(config_file)
 
-    
+    # initialize all callbacks
+    cb_list = []
+    if(train_config["with_visdom"]):
+        cb_list.append(VisdomCallback(None))
+    if(train_config["with_viewer"]):
+        cb_list.append(ViewerCallback())
+    if(train_config["with_wandb"]):
+        cb_list.append(WandBCallback(experiment_name,config_file,wandb_entity))
+    cb_list.append(StateCallback())
+    cb = CallbacksGroup(cb_list)
+
     # Initialize the networks model
     lattice=Lattice.create(config_file, "lattice") # create Lattice
     model = None
@@ -131,15 +131,11 @@ def run(dataset_name = "semantickitti"):
     secondary_fn=torch.nn.NLLLoss(ignore_index=m_ignore_index)  #combination of nll and dice  https://arxiv.org/pdf/1809.10486.pdf
 
     #create dataloaders for both phases
-    loader_train, loader_valid,_,_ = create_loader(train_config["dataset_name"], config_parser, model_config["sequence_learning"], loader_params["shuffle"])
+    loader_train, loader_valid,_,_ = create_loader(train_config["dataset_name"], config_parser, model_config["sequence_learning"], loader_params["shuffle"],train_border=0, valid_border=0)
     phases= [
         Phase('train', loader_train, grad=True),
         Phase('valid', loader_valid, grad=False)
     ]
-
-    # wandb.watch enables the tracking of gradients
-    if(train_config["with_wandb"]):
-        wandb.watch(model)
 
     nr_batches_processed, nr_epochs, first_time = 0,0,True  # set some parameters that track the progress
     
@@ -180,6 +176,9 @@ def run(dataset_name = "semantickitti"):
                             first_time=False
                             optimizer=torch.optim.AdamW(model.parameters(), lr=train_config["lr"], weight_decay=train_config["weight_decay"], amsgrad=True)
                             scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=3)
+                            # wandb.watch enables the tracking of gradients
+                            if(train_config["with_wandb"]):
+                                wandb.watch(model, log='all')
                             
                             if train_config["load_checkpoint"]:
                                 # now that all the parameters are created we can fill them with a model from a file
