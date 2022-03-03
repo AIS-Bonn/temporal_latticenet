@@ -9,8 +9,6 @@ import torch
 
 import sys, os, argparse, time
 from tqdm import tqdm
-#print(time.asctime())
-#print("PID: ", os.getpid()) # you can use any application to remind you if the script breaks by checking for this PID
 
 from dataloader.kitti_dataloader import *
 from dataloader.parisLille_dataloader import *
@@ -22,6 +20,7 @@ from callbacks.callback import *
 from callbacks.viewer_callback import *
 from callbacks.visdom_callback import *
 from callbacks.state_callback import *
+from callbacks.wandb_callback import *
 from callbacks.phase import *
 
 from cfgParser import *
@@ -36,6 +35,7 @@ from datetime import datetime
 #torch.manual_seed(0)
 #torch.autograd.set_detect_anomaly(True)
 torch.set_printoptions(edgeitems=3)
+wandb_entity = "peerschuett"
 
 # train_border and valid_border are integers, that define how many clouds are skipped, e.g. train_border = 6 means we start at the sixth cloud
 def create_loader(dataset_name, config_parser, sequence_learning = False, shuffle = False, train_border = None, valid_border = None):
@@ -98,6 +98,8 @@ def run(dataset_name = "semantickitti"):
         cb_list.append(VisdomCallback(None))
     if(train_config["with_viewer"]):
         cb_list.append(ViewerCallback())
+    if(train_config["with_wandb"]):
+        cb_list.append(WandBCallback(config_file,wandb_entity))
     cb_list.append(StateCallback())
     cb = CallbacksGroup(cb_list)
 
@@ -134,6 +136,10 @@ def run(dataset_name = "semantickitti"):
         Phase('train', loader_train, grad=True),
         Phase('valid', loader_valid, grad=False)
     ]
+
+    # wandb.watch enables the tracking of gradients
+    if(train_config["with_wandb"]):
+        wandb.watch(model)
 
     nr_batches_processed, nr_epochs, first_time = 0,0,True  # set some parameters that track the progress
     
@@ -173,13 +179,13 @@ def run(dataset_name = "semantickitti"):
                         if first_time and i==len(positions_seq)-1:
                             first_time=False
                             optimizer=torch.optim.AdamW(model.parameters(), lr=train_config["lr"], weight_decay=train_config["weight_decay"], amsgrad=True)
-                            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, verbose=True, factor=0.1)
-                            #scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=3)
+                            scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=3)
                             
                             if train_config["load_checkpoint"]:
                                 # now that all the parameters are created we can fill them with a model from a file
                                 model_path = os.path.join(train_config["checkpoint_path"], train_config["load_checkpoint_model"])
                                 print("Loading state dict: ", model_path)
+                                # https://discuss.pytorch.org/t/how-to-load-part-of-pre-trained-model/1113/3 -> load all parts of the state dict that exist in the current model
                                 model.load_state_dict(torch.load(model_path))
                                 model.train(phase.grad)
                                 model.reset_sequence()
