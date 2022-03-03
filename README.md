@@ -37,14 +37,12 @@ $ cd temporal_latticenet/seq_docker
 $ ./build.sh temporal_lattice_img
 $ ./run.sh temporal_lattice_img  
 $ # you need to setup your ssh key now
-$ # tested with commit 848a76edd03f72b8ef5865085fa1986c4753d504
-$ git clone --recursive https://github.com/RaduAlexandru/easy_pbr
+$ git clone --recursive https://github.com/peerschuett/easy_pbr
 $ cd easy_pbr && make && cd ..
 $ # tested with commit 0444e567c27220e6215e9cfca3fbb05f09fe0137
 $ git clone --recursive https://github.com/RaduAlexandru/data_loaders 
 $ cd data_loaders && make && cd ..
-$ # tested with commit 2058628a9d96acac184e0c7c161888fb91dce582
-$ git clone --recursive https://github.com/RaduAlexandru/lattice_net
+$ git clone --recursive https://github.com/peerschuett/lattice_net
 $ cd lattice_net && make && cd ..
 ```
 
@@ -129,6 +127,7 @@ Various configuration options can be interesting to check out and modify. We tak
 ```
 core: hdpi: false          #can be turned on an off to accomodate high DPI displays. If the text and fonts in the visualizer are too big, set this option to false
 train: with_viewer: false  #setting to true will start a visualizer which displays the currently segmented point cloud and the difference to the ground truth
+train: with_wandb: false   #setting to true will log loss, IoU and gradients to wandb (https://wandb.ai)
 ``` 
 <br/><br/>
 If training is performed with the viewer enabled, you should see something like this:
