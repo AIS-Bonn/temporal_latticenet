@@ -5,7 +5,7 @@ import numpy as np
 
 class WandBCallback(Callback):
 
-    def __init__(self, experiment_name, config_path, entity):
+    def __init__(self, experiment_name, config_path, entity, model):
         self.experiment_name=experiment_name
         # loading the config file like this and giving it to wandb stores them on the website
         with open(config_path, 'r') as j:
@@ -13,6 +13,9 @@ class WandBCallback(Callback):
         # Before this init can be run, you have to use wandb login in the console you are starting the script from (https://docs.wandb.ai/ref/cli/wandb-login, https://docs.wandb.ai/ref/python/init)
         # entity= your username
         wandb.init(project=experiment_name, entity=entity,config = cfg)
+        
+        # logs all gradients every log_freq step
+        wandb.watch(model, log_freq=1000)
 
         # define our custom x axis metric
         wandb.define_metric("train/step")
