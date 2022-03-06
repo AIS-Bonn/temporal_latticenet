@@ -39,7 +39,7 @@ wandb_entity = "peerschuett"
 experiment_name = "temporal_latticenet_tests"
 
 # train_border and valid_border are integers, that define how many clouds are skipped, e.g. train_border = 6 means we start at the sixth cloud
-def create_loader(dataset_name, config_parser, sequence_learning = False, shuffle = False, train_border = None, valid_border = None):
+def create_loader(dataset_name, config_parser, sequence_learning = False, shuffle = False, train_border = 0, valid_border = 0):
     if(dataset_name=="semantickitti"):
         train_dataset = SemanticKittiDataset(split = "train", config_parser = config_parser, sequence_learning = sequence_learning)
         valid_dataset = SemanticKittiDataset(split = "valid", config_parser = config_parser, sequence_learning = sequence_learning)
@@ -49,9 +49,9 @@ def create_loader(dataset_name, config_parser, sequence_learning = False, shuffl
     else:
         sys.exit("Dataset name not recognized. It is " + dataset_name)
     
-    train_sampler = list(range(len(train_dataset)))[train_border:] if train_border is not None else None
-    valid_sampler = list(range(len(valid_dataset)))[valid_border:] if valid_border is not None else None
-    shuffle = False if train_border is not None else shuffle
+    train_sampler = list(range(len(train_dataset)))[train_border:] if train_border > 0 else None
+    valid_sampler = list(range(len(valid_dataset)))[valid_border:] if valid_border > 0 else None
+    #shuffle = False if train_border > 0 else shuffle
 
     train_dataloader = torch.utils.data.DataLoader(train_dataset, num_workers = 8, batch_size=1, shuffle = shuffle, sampler = train_sampler)
     valid_dataloader = torch.utils.data.DataLoader(valid_dataset, num_workers = 8, batch_size=1, shuffle = False, sampler = valid_sampler)
@@ -120,7 +120,7 @@ def run(dataset_name = "semantickitti"):
     secondary_fn=torch.nn.NLLLoss(ignore_index=m_ignore_index)  #combination of nll and dice  https://arxiv.org/pdf/1809.10486.pdf
 
     #create dataloaders for both phases
-    loader_train, loader_valid,_,_ = create_loader(train_config["dataset_name"], config_parser, model_config["sequence_learning"], loader_params["shuffle"],train_border=18000, valid_border=0)
+    loader_train, loader_valid,_,_ = create_loader(train_config["dataset_name"], config_parser, model_config["sequence_learning"], loader_params["shuffle"],train_border=0, valid_border=0)
     phases= [
         Phase('train', loader_train, grad=True),
         Phase('valid', loader_valid, grad=False)

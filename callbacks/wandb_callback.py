@@ -38,6 +38,7 @@ class WandBCallback(Callback):
 
 
     def epoch_ended(self, phase, **kwargs):
+        phase.scores.update_best()
         mean_iou=phase.scores.avg_class_iou(print_per_class_iou=False)
         best_iou=phase.scores.best_iou if phase.epoch_nr > 0 else 0
 
