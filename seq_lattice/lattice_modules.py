@@ -186,12 +186,12 @@ class TemporalLinearModule(torch.nn.Module):
 
 # SpSequenceNet: https://openaccess.thecvf.com/content_CVPR_2020/papers/Shi_SpSequenceNet_Semantic_Segmentation_Network_on_4D_Point_Clouds_CVPR_2020_paper.pdf
 class CrossframeLocalInterpolationModule(torch.nn.Module):
-    def __init__(self, nr_output_channels):
+    def __init__(self, nr_output_channels, train_alpha_beta = True, use_center = True):
         super(CrossframeLocalInterpolationModule, self).__init__()
         self.h_lv = None
         
         self.nr_output_channels = nr_output_channels
-        self.AFLOW = CustomKernelConvLatticeIm2RowModule(nr_filters=nr_output_channels)
+        self.AFLOW = CustomKernelConvLatticeIm2RowModule(nr_filters=nr_output_channels, train_alpha_beta=train_alpha_beta, use_center= use_center)
         self.relu=torch.nn.ReLU(inplace=False)
         self.linear = torch.nn.Linear(self.nr_output_channels*2,self.nr_output_channels)
 
@@ -236,7 +236,7 @@ class CrossframeLocalInterpolationModule(torch.nn.Module):
 
 
 class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
-    def __init__(self, nr_filters, neighbourhood_size=1, dilation=1, bias=True ):
+    def __init__(self, nr_filters, neighbourhood_size=1, dilation=1, bias=True,  use_center= True, train_alpha_beta=True):
         super(CustomKernelConvLatticeIm2RowModule, self).__init__()
         self.first_time=True
         self.weight=None
@@ -245,10 +245,16 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
         self.nr_filters=nr_filters
         self.dilation=dilation
         self.use_bias=bias
-        #self.alpha = torch.tensor(0.1, requires_grad = True)
-        #self.beta = torch.tensor(0.1, requires_grad = True)
-        self.alpha = torch.nn.Parameter(data=torch.tensor(0.1), requires_grad=True)
-        self.beta = torch.nn.Parameter(data=torch.tensor(0.1), requires_grad=True)
+        self.use_center=use_center
+
+        if train_alpha_beta == True:
+            print("AFLOW: Training alpha and beta values")
+            self.alpha = torch.nn.Parameter(data=torch.tensor(0.1), requires_grad=True)
+            self.beta = torch.nn.Parameter(data=torch.tensor(0.1), requires_grad=True)
+        else:
+            print("AFLOW: alpha and beta are set to 0.1 (constant)")
+            self.alpha = torch.tensor(0.1)
+            self.beta = torch.tensor(0.1)
         #self.alpha = 0.18 #0.4 # values from SpSequenceNet
         #self.beta = 0.5    # values from SpSequenceNet
         self.weights = None
@@ -273,7 +279,7 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
 
 
     # hidden state is the already padded h^(t-1)
-    def forward(self, lattice_values, hidden_state, lattice_structure, use_center=True):
+    def forward(self, lattice_values, hidden_state, lattice_structure):
 
         lattice_structure.set_values(lattice_values)
         filter_extent=lattice_structure.get_filter_extent(self.neighbourhood_size)
@@ -299,7 +305,7 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
             
         # x += 1 -> in-place https://discuss.pytorch.org/t/leaf-variable-was-used-in-an-inplace-operation/308
         # x = x+1 -> not in-place
-
+        
         AFLOW_lv = torch.zeros_like(lattice_values).to("cuda") 
         distances = torch.zeros((lattice_values.shape[0],9)).to("cuda")
         weights = torch.zeros((lattice_values.shape[0],9)).to("cuda")
@@ -310,13 +316,15 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
         distances[:,:] = distances[:,:] + torch.cdist(x1 = lattice_neighbors_previous[:,:].reshape(lattice_values.shape[0],-1,self.nr_filters), x2=lattice_values[:,:].unsqueeze(1), p=2.0).squeeze(2)
         #distances[:,:] = distances[:,:] + torch.cdist(x1=lattice_values[:,:].unsqueeze(1), x2 = lattice_neighbors_previous[:,:].reshape(lattice_values.shape[0],-1,self.nr_filters)).squeeze(2)
         distances[:,:] = distances[:,:]* (lattice_neighbors_previous_index[:,::self.nr_filters] != -1)  # we dont want the feature vector of the <not found> neighbors. These are often written down as -1
-        distances[:,-1] = distances[:,-1]*float(use_center) # last element is the center vertex
+        if self.use_center == False:
+            distances[:,-1] = distances[:,-1]*0. # last element is the center vertex
         distances[:,:] = distances[:,:] * 1/(torch.sum(distances[:,:], dim = 1).unsqueeze(1).repeat_interleave(9,dim=1).detach()) # normalization
         
         # 3) Calc weights from distances
         weights[:,:] = weights[:,:] + (alpha_tensor - torch.min(distances[:,:], alpha_tensor))*self.beta 
         weights[:,:] = weights[:,:] * (lattice_neighbors_previous_index[:,::self.nr_filters] != -1)  # we dont want the feature vector of the <not found> neighbors
-        weights[:,-1] = weights[:,-1]*float(use_center) # last element is the center vertex
+        if self.use_center == False:
+            weights[:,-1] = weights[:,-1]*0. # last element is the center vertex
         #print(weights)
 
         # 4) Weight all neighbors with their respective weights
@@ -326,7 +334,7 @@ class CustomKernelConvLatticeIm2RowModule(torch.nn.Module):
             AFLOW_lv+=self.bias
         #print("Alpha: ", self.alpha, " Beta: ", self.beta)
 
-        # I do not do ls.set_values(AFLOW_lv), because I am only interested in the feature vector
+        # I do not execute ls.set_values(AFLOW_lv), because I am only interested in the feature vector
         lattice_structure.set_values(lattice_values)
         return AFLOW_lv, weights, lattice_neighbors_previous_index[:,::self.nr_filters]
 

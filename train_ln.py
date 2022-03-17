@@ -177,8 +177,18 @@ def run(dataset_name = "semantickitti"):
                         #if its the first time we do a forward on the model we need to load the checkpoint
                         if first_time and i==len(positions_seq)-1:
                             first_time=False
+                            # initialize optimizer
                             optimizer=torch.optim.AdamW(model.parameters(), lr=train_config["lr"], weight_decay=train_config["weight_decay"], amsgrad=True)
-                            scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=3)
+                            # initialize scheduler
+                            if train_config["scheduler"] == "CosineAnnealingWarmRestarts":
+                                restart_epochs = train_config["restart_epochs"]
+                                print("Scheduler: CosineAnnealingWarmRestarts with restarts after {} epochs.".format(restart_epochs))
+                                scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=restart_epochs)
+                            elif train_config["scheduler"] == "ReduceLROnPlateau":
+                                print("Scheduler: ReduceLROnPlateau ")
+                                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, verbose=True, factor=0.1)
+                            else:
+                                sys.exit("Scheduler has to be either ReduceLROnPlateau or CosineAnnealingWarmRestarts. I got {}".format(train_config["scheduler"]))
                                                         
                             if train_config["load_checkpoint"]:
                                 # now that all the parameters are created we can fill them with a model from a file
@@ -212,6 +222,7 @@ def run(dataset_name = "semantickitti"):
                     
                     #backward
                     if is_training and (i == len(positions_seq)-1):
+                        # CosineAnnealingWarmRestarts has to be changed after each iteration
                         if isinstance(scheduler, torch.optim.lr_scheduler.CosineAnnealingWarmRestarts):
                             scheduler.step(phase.epoch_nr + float(phase.samples_processed_this_epoch) / (len(phase.loader.dataset)) )
                         
@@ -227,9 +238,10 @@ def run(dataset_name = "semantickitti"):
                         model.reset_sequence()
                         lattice=Lattice.create(config_file, "lattice")
 
-                # After one epoch change the LR based on scheduler
+                # End of epoch
                 if batch_idx == len(loader_iter)-1:
                     pbar.close()
+                    # If we use ReduceLROnPlateau, we only do steps here 
                     if not is_training: #we reduce the learning rate when the test iou plateus
                         if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                             scheduler.step(phase.loss_acum_per_epoch) #for ReduceLROnPlateau
@@ -249,9 +261,10 @@ def run(dataset_name = "semantickitti"):
                 if train_config["with_viewer"]:
                     view.update()
 
-                if is_training:
-                    if isinstance(scheduler, torch.optim.lr_scheduler.CosineAnnealingWarmRestarts):
-                        scheduler.step(phase.epoch_nr + float(phase.samples_processed_this_epoch) / (len(phase.loader.dataset)) )
+                # Shouldn't be here -> should be done after each cloud sequence
+                #if is_training:
+                #    if isinstance(scheduler, torch.optim.lr_scheduler.CosineAnnealingWarmRestarts):
+                #        scheduler.step(phase.epoch_nr + float(phase.samples_processed_this_epoch) / (len(phase.loader.dataset)) )
 
                 nr_batches_processed+=1
 

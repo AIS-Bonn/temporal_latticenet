@@ -76,6 +76,9 @@ class LNN_SEQ(torch.nn.Module):
             if (self.sequence_learning) and (self.rnn_modules[1] == "linear"):
                 print("adding Middle_Linear fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
             self.middle_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels() )
+            if (self.sequence_learning) and (self.rnn_modules[2] == "linear"):
+                print("adding Bottle_Linear fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
+            self.bottle_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "linear"):
                 print("adding Late_Linear fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
             self.late_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels()*3)
@@ -83,6 +86,9 @@ class LNN_SEQ(torch.nn.Module):
             if (self.sequence_learning) and (self.rnn_modules[1] == "maxpool"):
                 print("adding Middle_MaxPool fusion")
             self.middle_fusion_maxpool = TemporalMaxPoolModule()
+            if (self.sequence_learning) and (self.rnn_modules[2] == "maxpool"):
+                print("adding Bottle_MaxPool fusion")
+            self.bottle_fusion_maxpool = TemporalMaxPoolModule()
             if (self.sequence_learning) and (self.rnn_modules[3] == "maxpool"):
                 print("adding Late_MaxPool fusion")
             self.late_fusion_maxpool = TemporalMaxPoolModule()
@@ -90,6 +96,9 @@ class LNN_SEQ(torch.nn.Module):
             if (self.sequence_learning) and (self.rnn_modules[1] == "cga"):
                 print("adding Middle_CGA fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
             self.middle_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels())
+            if (self.sequence_learning) and (self.rnn_modules[2] == "cga"):
+                print("adding Bottle_CGA fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
+            self.bottle_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "cga"):
                 print("adding Late_CGA fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
             self.late_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*3)
@@ -97,6 +106,9 @@ class LNN_SEQ(torch.nn.Module):
             if (self.sequence_learning) and (self.rnn_modules[1] == "lstm"):
                 print("adding Middle_LSTM fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
             self.middle_LSTM = LSTMModule(model_params.pointnet_start_nr_channels())
+            if (self.sequence_learning) and (self.rnn_modules[2] == "lstm"):
+                print("adding Bottle_LSTM fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
+            self.bottle_LSTM = GRUModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "lstm"):
                 print("adding Late_LSTM fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
             self.late_LSTM = LSTMModule(model_params.pointnet_start_nr_channels()*3)
@@ -104,6 +116,9 @@ class LNN_SEQ(torch.nn.Module):
             if (self.sequence_learning) and (self.rnn_modules[1] == "gru"):
                 print("adding Middle_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
             self.middle_GRU = GRUModule(model_params.pointnet_start_nr_channels())
+            if (self.sequence_learning) and (self.rnn_modules[2] == "gru"):
+                print("adding Bottle_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
+            self.bottle_GRU = GRUModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "gru"):
                 print("adding Late_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
             self.late_GRU = GRUModule(model_params.pointnet_start_nr_channels()*3)
@@ -142,7 +157,7 @@ class LNN_SEQ(torch.nn.Module):
                     self.resnet_blocks_per_down_lvl_list[i].append( BottleneckBlock(cur_channels_count, [False,False,False]) )
             skip_connection_channel_counts.append(cur_channels_count)
             nr_channels_after_coarsening=int(cur_channels_count*2*compression_factor)
-            print("adding bnReluCorsen which outputs nr of channels ", nr_channels_after_coarsening )
+            print("adding bnReluCoarsen which outputs nr of channels ", nr_channels_after_coarsening )
             self.coarsens_list.append( GnReluCoarsen(nr_channels_after_coarsening)) #is still the best one because it can easily learn the versions of Avg and Blur. and the Max version is the worse for some reason
             cur_channels_count=nr_channels_after_coarsening
             corsenings_channel_counts.append(cur_channels_count)
@@ -222,14 +237,19 @@ class LNN_SEQ(torch.nn.Module):
         if self.sequence_learning:
             self.point_net_seq.reset_sequence()
             self.middle_fusion_linear.reset_sequence()
+            self.bottle_fusion_linear.reset_sequence()
             self.late_fusion_linear.reset_sequence()
             self.middle_fusion_maxpool.reset_sequence()
+            self.bottle_fusion_maxpool.reset_sequence()
             self.late_fusion_maxpool.reset_sequence()
             self.middle_CGA.reset_sequence()
+            self.bottle_CGA.reset_sequence()
             self.late_CGA.reset_sequence()
             self.middle_LSTM.reset_sequence()
+            self.bottle_LSTM.reset_sequence()
             self.late_LSTM.reset_sequence()
             self.middle_GRU.reset_sequence()
+            self.bottle_GRU.reset_sequence()
             self.late_GRU.reset_sequence()
             self.AFLOW.reset_sequence()
             self.middle_AFLOW.reset_sequence()
@@ -314,8 +334,22 @@ class LNN_SEQ(torch.nn.Module):
             # print("bottleneck stage", j,  "lv has shape", lv.shape, "ls has val_dim", ls.val_dim()  )
             lv, ls = self.resnet_blocks_bottleneck[j] ( lv, ls) 
             
-        if (self.sequence_learning) and (self.rnn_modules[2] == "aflow"):
-            lv,ls = self.AFLOW(lv,ls)
+        #if (self.sequence_learning) and (self.rnn_modules[2] == "aflow"):
+        #    lv,ls = self.AFLOW(lv,ls)
+
+        if (self.sequence_learning):
+            if(self.rnn_modules[2] == "linear"):
+                lv, ls = self.bottle_fusion_linear(lv,ls)
+            if(self.rnn_modules[2] == "maxpool"):
+                lv, ls = self.bottle_fusion_maxpool(lv,ls)
+            if(self.rnn_modules[2] == "lstm"):
+                lv, ls = self.bottle_LSTM(lv,ls)
+            if(self.rnn_modules[2] == "gru"):
+                lv, ls = self.bottle_GRU(lv,ls)
+            if(self.rnn_modules[2] == "cga"):
+                lv, ls = self.bottle_CGA(lv,ls)
+            if(self.rnn_modules[2] == "aflow"):
+                lv, ls = self.AFLOW(lv,ls)
         #print("bottle: ", lv.shape)
         
         # we need to do this, because the ls has to be reset to the correct structure in the first dimension
