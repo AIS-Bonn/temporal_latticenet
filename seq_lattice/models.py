@@ -70,68 +70,89 @@ class LNN_SEQ(torch.nn.Module):
         ######################
         # Recurrent Modules  #
         ###################### 
-        
+        recurrent_fusion_modules = torch.nn.ModuleList([None]*3)# middle, bottleneck and late fusion are saved here
         if( self.sequence_learning ):
 
             if (self.sequence_learning) and (self.rnn_modules[1] == "linear"):
                 print("adding Middle_Linear fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
-            self.middle_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels() )
+                recurrent_fusion_modules[0] = TemporalLinearModule(model_params.pointnet_start_nr_channels() )
+            #self.middle_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels() )
+
             if (self.sequence_learning) and (self.rnn_modules[2] == "linear"):
                 print("adding Bottle_Linear fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
-            self.bottle_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels()*4)
+                recurrent_fusion_modules[1] = TemporalLinearModule(model_params.pointnet_start_nr_channels()*4)
+            #self.bottle_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "linear"):
                 print("adding Late_Linear fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
-            self.late_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels()*3)
+                recurrent_fusion_modules[2] = TemporalLinearModule(model_params.pointnet_start_nr_channels()*3)
+            #self.late_fusion_linear = TemporalLinearModule(model_params.pointnet_start_nr_channels()*3)
 
             if (self.sequence_learning) and (self.rnn_modules[1] == "maxpool"):
                 print("adding Middle_MaxPool fusion")
-            self.middle_fusion_maxpool = TemporalMaxPoolModule()
+                recurrent_fusion_modules[0] = TemporalMaxPoolModule()
+            #self.middle_fusion_maxpool = TemporalMaxPoolModule()
             if (self.sequence_learning) and (self.rnn_modules[2] == "maxpool"):
                 print("adding Bottle_MaxPool fusion")
-            self.bottle_fusion_maxpool = TemporalMaxPoolModule()
+                recurrent_fusion_modules[1] = TemporalMaxPoolModule()
+            #self.bottle_fusion_maxpool = TemporalMaxPoolModule()
             if (self.sequence_learning) and (self.rnn_modules[3] == "maxpool"):
                 print("adding Late_MaxPool fusion")
-            self.late_fusion_maxpool = TemporalMaxPoolModule()
+                recurrent_fusion_modules[2] = TemporalMaxPoolModule()
+            #self.late_fusion_maxpool = TemporalMaxPoolModule()
 
             if (self.sequence_learning) and (self.rnn_modules[1] == "cga"):
                 print("adding Middle_CGA fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
-            self.middle_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels())
+                recurrent_fusion_modules[0] = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels())
+            #self.middle_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels())
             if (self.sequence_learning) and (self.rnn_modules[2] == "cga"):
                 print("adding Bottle_CGA fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
-            self.bottle_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*4)
+                recurrent_fusion_modules[1] = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*4)
+            #self.bottle_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "cga"):
                 print("adding Late_CGA fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
-            self.late_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*3)
+                recurrent_fusion_modules[2] = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*3)
+            #self.late_CGA = CrossframeGlobalAttentionModule(model_params.pointnet_start_nr_channels()*3)
 
             if (self.sequence_learning) and (self.rnn_modules[1] == "lstm"):
                 print("adding Middle_LSTM fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
-            self.middle_LSTM = LSTMModule(model_params.pointnet_start_nr_channels())
+                recurrent_fusion_modules[0] = LSTMModule(model_params.pointnet_start_nr_channels())
+            #self.middle_LSTM = LSTMModule(model_params.pointnet_start_nr_channels())
             if (self.sequence_learning) and (self.rnn_modules[2] == "lstm"):
                 print("adding Bottle_LSTM fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
-            self.bottle_LSTM = GRUModule(model_params.pointnet_start_nr_channels()*4)
+                recurrent_fusion_modules[1] = LSTMModule(model_params.pointnet_start_nr_channels()*4)
+            #self.bottle_LSTM = GRUModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "lstm"):
                 print("adding Late_LSTM fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
-            self.late_LSTM = LSTMModule(model_params.pointnet_start_nr_channels()*3)
+                recurrent_fusion_modules[2] = LSTMModule(model_params.pointnet_start_nr_channels()*3)
+            #self.late_LSTM = LSTMModule(model_params.pointnet_start_nr_channels()*3)
 
             if (self.sequence_learning) and (self.rnn_modules[1] == "gru"):
                 print("adding Middle_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels())
-            self.middle_GRU = GRUModule(model_params.pointnet_start_nr_channels())
+                recurrent_fusion_modules[0] = GRUModule(model_params.pointnet_start_nr_channels())
+            #self.middle_GRU = GRUModule(model_params.pointnet_start_nr_channels())
             if (self.sequence_learning) and (self.rnn_modules[2] == "gru"):
                 print("adding Bottle_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
-            self.bottle_GRU = GRUModule(model_params.pointnet_start_nr_channels()*4)
+                recurrent_fusion_modules[1] = GRUModule(model_params.pointnet_start_nr_channels()*4)
+            #self.bottle_GRU = GRUModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "gru"):
                 print("adding Late_GRU fusion with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
-            self.late_GRU = GRUModule(model_params.pointnet_start_nr_channels()*3)
+                recurrent_fusion_modules[2] = GRUModule(model_params.pointnet_start_nr_channels()*3)
+            #self.late_GRU = GRUModule(model_params.pointnet_start_nr_channels()*3)
 
             if (self.sequence_learning) and (self.rnn_modules[1] == "aflow"):
                 print("adding Middle_AFLOW Module with nr_output_channels ", model_params.pointnet_start_nr_channels())
-            self.middle_AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels())
+                recurrent_fusion_modules[0] = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels())
+            #self.middle_AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels())
             if (self.sequence_learning) and (self.rnn_modules[2] == "aflow"):
                 print("adding Bottleneck_AFLOW Module with nr_output_channels ", model_params.pointnet_start_nr_channels()*4)
-            self.AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*4)
+                recurrent_fusion_modules[1] = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*4)
+            #self.AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*4)
             if (self.sequence_learning) and (self.rnn_modules[3] == "aflow"):
                 print("adding LATE_AFLOW Module with nr_output_channels ", model_params.pointnet_start_nr_channels()*3)
-            self.late_AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*3)
+                recurrent_fusion_modules[2] = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*3)
+            #self.late_AFLOW = CrossframeLocalInterpolationModule(model_params.pointnet_start_nr_channels()*3)
+            
+            self.recurrent_fusion_modules = recurrent_fusion_modules
 
 
         #####################
@@ -236,24 +257,28 @@ class LNN_SEQ(torch.nn.Module):
 
         if self.sequence_learning:
             self.point_net_seq.reset_sequence()
-            self.middle_fusion_linear.reset_sequence()
-            self.bottle_fusion_linear.reset_sequence()
-            self.late_fusion_linear.reset_sequence()
-            self.middle_fusion_maxpool.reset_sequence()
-            self.bottle_fusion_maxpool.reset_sequence()
-            self.late_fusion_maxpool.reset_sequence()
-            self.middle_CGA.reset_sequence()
-            self.bottle_CGA.reset_sequence()
-            self.late_CGA.reset_sequence()
-            self.middle_LSTM.reset_sequence()
-            self.bottle_LSTM.reset_sequence()
-            self.late_LSTM.reset_sequence()
-            self.middle_GRU.reset_sequence()
-            self.bottle_GRU.reset_sequence()
-            self.late_GRU.reset_sequence()
-            self.AFLOW.reset_sequence()
-            self.middle_AFLOW.reset_sequence()
-            self.late_AFLOW.reset_sequence()
+            
+            for module in self.recurrent_fusion_modules:
+                if module is not None:
+                    module.reset_sequence()
+            # self.middle_fusion_linear.reset_sequence()
+            # self.bottle_fusion_linear.reset_sequence()
+            # self.late_fusion_linear.reset_sequence()
+            # self.middle_fusion_maxpool.reset_sequence()
+            # self.bottle_fusion_maxpool.reset_sequence()
+            # self.late_fusion_maxpool.reset_sequence()
+            # self.middle_CGA.reset_sequence()
+            # self.bottle_CGA.reset_sequence()
+            # self.late_CGA.reset_sequence()
+            # self.middle_LSTM.reset_sequence()
+            # self.bottle_LSTM.reset_sequence()
+            # self.late_LSTM.reset_sequence()
+            # self.middle_GRU.reset_sequence()
+            # self.bottle_GRU.reset_sequence()
+            # self.late_GRU.reset_sequence()
+            # self.AFLOW.reset_sequence()
+            # self.middle_AFLOW.reset_sequence()
+            # self.late_AFLOW.reset_sequence()
 
 
     def forward(self, ls, positions, values, early_return = False, with_gradient = True, vis_aflow = False):
@@ -300,18 +325,21 @@ class LNN_SEQ(torch.nn.Module):
             if i == 0:
                 # print("middle: ", lv.shape)
                 if (self.sequence_learning):
-                    if(self.rnn_modules[1] == "linear"):
-                        lv, ls = self.middle_fusion_linear(lv,ls)
-                    if(self.rnn_modules[1] == "maxpool"):
-                        lv, ls = self.middle_fusion_maxpool(lv,ls)
-                    if(self.rnn_modules[1] == "lstm"):
-                        lv, ls = self.middle_LSTM(lv,ls)
-                    if(self.rnn_modules[1] == "gru"):
-                        lv, ls = self.middle_GRU(lv,ls)
-                    if(self.rnn_modules[1] == "cga"):
-                        lv, ls = self.middle_CGA(lv,ls)
-                    if(self.rnn_modules[1] == "aflow"):
-                        lv, ls = self.middle_AFLOW(lv,ls)
+                    # if(self.rnn_modules[1] == "linear"):
+                    #     lv, ls = self.middle_fusion_linear(lv,ls)
+                    # if(self.rnn_modules[1] == "maxpool"):
+                    #     lv, ls = self.middle_fusion_maxpool(lv,ls)
+                    # if(self.rnn_modules[1] == "lstm"):
+                    #     lv, ls = self.middle_LSTM(lv,ls)
+                    # if(self.rnn_modules[1] == "gru"):
+                    #     lv, ls = self.middle_GRU(lv,ls)
+                    # if(self.rnn_modules[1] == "cga"):
+                    #     lv, ls = self.middle_CGA(lv,ls)
+                    # if(self.rnn_modules[1] == "aflow"):
+                    #     lv, ls = self.middle_AFLOW(lv,ls)
+                    
+                    if self.recurrent_fusion_modules[0] is not None:
+                        lv, ls = (self.recurrent_fusion_modules[0])(lv,ls)
 
                 #print("middle: ", lv.shape)
 
@@ -338,18 +366,20 @@ class LNN_SEQ(torch.nn.Module):
         #    lv,ls = self.AFLOW(lv,ls)
 
         if (self.sequence_learning):
-            if(self.rnn_modules[2] == "linear"):
-                lv, ls = self.bottle_fusion_linear(lv,ls)
-            if(self.rnn_modules[2] == "maxpool"):
-                lv, ls = self.bottle_fusion_maxpool(lv,ls)
-            if(self.rnn_modules[2] == "lstm"):
-                lv, ls = self.bottle_LSTM(lv,ls)
-            if(self.rnn_modules[2] == "gru"):
-                lv, ls = self.bottle_GRU(lv,ls)
-            if(self.rnn_modules[2] == "cga"):
-                lv, ls = self.bottle_CGA(lv,ls)
-            if(self.rnn_modules[2] == "aflow"):
-                lv, ls = self.AFLOW(lv,ls)
+            # if(self.rnn_modules[2] == "linear"):
+            #     lv, ls = self.bottle_fusion_linear(lv,ls)
+            # if(self.rnn_modules[2] == "maxpool"):
+            #     lv, ls = self.bottle_fusion_maxpool(lv,ls)
+            # if(self.rnn_modules[2] == "lstm"):
+            #     lv, ls = self.bottle_LSTM(lv,ls)
+            # if(self.rnn_modules[2] == "gru"):
+            #     lv, ls = self.bottle_GRU(lv,ls)
+            # if(self.rnn_modules[2] == "cga"):
+            #     lv, ls = self.bottle_CGA(lv,ls)
+            # if(self.rnn_modules[2] == "aflow"):
+            #     lv, ls = self.AFLOW(lv,ls)
+            if self.recurrent_fusion_modules[1] is not None:
+                lv, ls = (self.recurrent_fusion_modules[1])(lv,ls)
         #print("bottle: ", lv.shape)
         
         # we need to do this, because the ls has to be reset to the correct structure in the first dimension
@@ -376,20 +406,23 @@ class LNN_SEQ(torch.nn.Module):
 
                 if i == (self.nr_downsamples-1):
                     #print("late: ", lv.shape)
-                    if (self.sequence_learning):
-                        if(self.rnn_modules[3] == "linear"):
-                            lv, ls = self.late_fusion_linear(lv,ls)
-                        if(self.rnn_modules[3] == "maxpool"):
-                            lv, ls = self.late_fusion_maxpool(lv,ls)
-                        if(self.rnn_modules[3] == "lstm"):
-                            lv, ls = self.late_LSTM(lv,ls)
-                        if(self.rnn_modules[3] == "gru"):
-                            lv, ls = self.late_GRU(lv,ls)
-                        if(self.rnn_modules[3] == "cga"):
-                            lv, ls = self.late_CGA(lv,ls)
-                        if(self.rnn_modules[3] == "aflow"):
-                            lv, ls = self.late_AFLOW(lv,ls)
+                    # if (self.sequence_learning):
+                    #     if(self.rnn_modules[3] == "linear"):
+                    #         lv, ls = self.late_fusion_linear(lv,ls)
+                    #     if(self.rnn_modules[3] == "maxpool"):
+                    #         lv, ls = self.late_fusion_maxpool(lv,ls)
+                    #     if(self.rnn_modules[3] == "lstm"):
+                    #         lv, ls = self.late_LSTM(lv,ls)
+                    #     if(self.rnn_modules[3] == "gru"):
+                    #         lv, ls = self.late_GRU(lv,ls)
+                    #     if(self.rnn_modules[3] == "cga"):
+                    #         lv, ls = self.late_CGA(lv,ls)
+                    #     if(self.rnn_modules[3] == "aflow"):
+                    #         lv, ls = self.late_AFLOW(lv,ls)
                     #print("late: ", lv.shape)
+
+                    if self.recurrent_fusion_modules[2] is not None:
+                        lv, ls = (self.recurrent_fusion_modules[2])(lv,ls)
 
                     if (early_return) and (self.sequence_learning):
                         self.first_sequence = False

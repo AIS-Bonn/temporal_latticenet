@@ -359,25 +359,32 @@ class PointNetSeqModule(torch.nn.Module):
         self.h_lv = None
         self.rnn_modules = rnn_modules
         self.multiplier_hidden_activations=multiplier_hidden_activations
+        self.fusion_module = None
 
         if (self.sequence_learning) and (rnn_modules[0]=="linear" ):
             print("adding Early_Linear fusion with nr_output_channels ", self.nr_outputs_last_layer)
-        self.early_fusion_linear = TemporalLinearModule( self.nr_output_channels_per_layer[-1]*2 )
+            self.fusion_module = TemporalLinearModule( self.nr_output_channels_per_layer[-1]*2 )
+        #self.early_fusion_linear = TemporalLinearModule( self.nr_output_channels_per_layer[-1]*2 )
         if (self.sequence_learning) and (rnn_modules[0]=="cga" ):
             print("adding Early_CGA with nr_output_channels ", self.nr_outputs_last_layer)
-        self.CGA = CrossframeGlobalAttentionModule(self.nr_output_channels_per_layer[-1]*2)
+            self.fusion_module = CrossframeGlobalAttentionModule(self.nr_output_channels_per_layer[-1]*2)
+        #self.CGA = CrossframeGlobalAttentionModule(self.nr_output_channels_per_layer[-1]*2)
         if (self.sequence_learning) and (rnn_modules[0]=="aflow" ):
             print("adding Early_AFLOW with nr_output_channels ", self.nr_outputs_last_layer)
-        self.AFLOW = CrossframeLocalInterpolationModule( self.nr_output_channels_per_layer[-1]*2)
+            self.fusion_module = CrossframeLocalInterpolationModule( self.nr_output_channels_per_layer[-1]*2)
+        #self.AFLOW = CrossframeLocalInterpolationModule( self.nr_output_channels_per_layer[-1]*2)
         if (self.sequence_learning) and (rnn_modules[0]=="lstm" ):
             print("adding Early_LSTM with nr_output_channels ", self.nr_outputs_last_layer)
-        self.LSTM = LSTMModule(self.nr_output_channels_per_layer[-1]*2)
+            self.fusion_module = LSTMModule(self.nr_output_channels_per_layer[-1]*2)
+        #self.LSTM = LSTMModule(self.nr_output_channels_per_layer[-1]*2)
         if (self.sequence_learning) and (rnn_modules[0]=="gru" ):
             print("adding Early_GRU with nr_output_channels ", self.nr_outputs_last_layer)
-        self.GRU = GRUModule(self.nr_output_channels_per_layer[-1]*2)
+            self.fusion_module = GRUModule(self.nr_output_channels_per_layer[-1]*2)
+        #self.GRU = GRUModule(self.nr_output_channels_per_layer[-1]*2)
         if (self.sequence_learning) and (rnn_modules[0]=="maxpool" ):
             print("adding Early_MaxPool with nr_output_channels ", self.nr_outputs_last_layer)
-        self.fusion_maxpool = TemporalMaxPoolModule()
+            self.fusion_module = TemporalMaxPoolModule()
+        #self.fusion_maxpool = TemporalMaxPoolModule()
         self.is_early_maxpool_fusion =  ( rnn_modules[0]=="maxpool" and sequence_learning)  
 
         self.diff_matrix = None
@@ -388,12 +395,13 @@ class PointNetSeqModule(torch.nn.Module):
         self.nr_iters=0
 
     def reset_sequence(self):
-        self.early_fusion_linear.reset_sequence()
-        self.fusion_maxpool.reset_sequence()
-        self.CGA.reset_sequence()
-        self.LSTM.reset_sequence()
-        self.GRU.reset_sequence()
-        self.AFLOW.reset_sequence()
+        self.fusion_module.reset_sequence()
+        # self.early_fusion_linear.reset_sequence()
+        # self.fusion_maxpool.reset_sequence()
+        # self.CGA.reset_sequence()
+        # self.LSTM.reset_sequence()
+        # self.GRU.reset_sequence()
+        # self.AFLOW.reset_sequence()
         self.h_lv = None
 
     def forward(self, lattice_py, distributed, indices):
@@ -524,8 +532,26 @@ class PointNetSeqModule(torch.nn.Module):
         lattice_py.set_values(distributed_reduced)
         #print("Reduced: ", distributed_reduced.shape)
 
-        if(self.rnn_modules[0] == "linear"):
-            distributed_reduced, lattice_py = self.early_fusion_linear(distributed_reduced, lattice_py)
+        # if(self.rnn_modules[0] == "linear"):
+        #     distributed_reduced, lattice_py = self.early_fusion_linear(distributed_reduced, lattice_py)
+        # if(self.rnn_modules[0] == "maxpool"):
+        #     #the distributed reduced at second timestp has some zero rows which correspond to the rows (vertices) that are not touched by the current cloud, we have to set them to -999 so that the maxpool seelct the one from the previous timestep
+        #     feat_size=distributed_reduced.shape[1]
+        #     distributed_reduced_features=distributed_reduced[:, 0:int(feat_size/2) ]
+        #     distributed_reduced_sumrowwise=distributed_reduced_features.abs().sum(dim=1)
+        #     distributed_reduced_sumrowwise=distributed_reduced_sumrowwise.unsqueeze(1)
+        #     mask_zeros=distributed_reduced_sumrowwise==0
+        #     distributed_reduced=distributed_reduced.masked_fill(mask_zeros, -9900)
+        #     distributed_reduced, lattice_py = self.fusion_maxpool(distributed_reduced, lattice_py)
+        # if(self.rnn_modules[0] == "lstm"):
+        #     distributed_reduced, lattice_py = self.LSTM(distributed_reduced, lattice_py)
+        # if(self.rnn_modules[0] == "gru"):
+        #     distributed_reduced, lattice_py = self.GRU(distributed_reduced, lattice_py)
+        # if(self.rnn_modules[0] == "cga"):
+        #     distributed_reduced, lattice_py = self.CGA(distributed_reduced, lattice_py)
+        # if(self.rnn_modules[0] == "aflow"):
+        #     distributed_reduced, lattice_py = self.AFLOW(distributed_reduced, lattice_py)
+        
         if(self.rnn_modules[0] == "maxpool"):
             #the distributed reduced at second timestp has some zero rows which correspond to the rows (vertices) that are not touched by the current cloud, we have to set them to -999 so that the maxpool seelct the one from the previous timestep
             feat_size=distributed_reduced.shape[1]
@@ -534,15 +560,9 @@ class PointNetSeqModule(torch.nn.Module):
             distributed_reduced_sumrowwise=distributed_reduced_sumrowwise.unsqueeze(1)
             mask_zeros=distributed_reduced_sumrowwise==0
             distributed_reduced=distributed_reduced.masked_fill(mask_zeros, -9900)
-            distributed_reduced, lattice_py = self.fusion_maxpool(distributed_reduced, lattice_py)
-        if(self.rnn_modules[0] == "lstm"):
-            distributed_reduced, lattice_py = self.LSTM(distributed_reduced, lattice_py)
-        if(self.rnn_modules[0] == "gru"):
-            distributed_reduced, lattice_py = self.GRU(distributed_reduced, lattice_py)
-        if(self.rnn_modules[0] == "cga"):
-            distributed_reduced, lattice_py = self.CGA(distributed_reduced, lattice_py)
-        if(self.rnn_modules[0] == "aflow"):
-            distributed_reduced, lattice_py = self.AFLOW(distributed_reduced, lattice_py)
+            distributed_reduced, lattice_py = self.fusion_module(distributed_reduced, lattice_py)
+        elif self.sequence_learning == True:
+            distributed_reduced, lattice_py = self.fusion_module(distributed_reduced, lattice_py)
 
 
 
