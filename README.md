@@ -1,4 +1,4 @@
-# Temporal LatticeNet
+# Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice
 
 [Project Page](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/) | [Video](https://www.youtube.com/watch?v=ljjMDkSLl0g) | [Paper](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/ICRA_2022_Schuett.pdf)
 
