@@ -261,11 +261,6 @@ def run(dataset_name = "semantickitti"):
                 if train_config["with_viewer"]:
                     view.update()
 
-                # Shouldn't be here -> should be done after each cloud sequence
-                #if is_training:
-                #    if isinstance(scheduler, torch.optim.lr_scheduler.CosineAnnealingWarmRestarts):
-                #        scheduler.step(phase.epoch_nr + float(phase.samples_processed_this_epoch) / (len(phase.loader.dataset)) )
-
                 nr_batches_processed+=1
 
             if phase.grad:

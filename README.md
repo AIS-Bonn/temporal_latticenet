@@ -8,7 +8,9 @@
  [Sven Behnke](https://www.ais.uni-bonn.de/behnke/) <sup>1</sup>
  <br>
  <sup>1</sup>University of Bonn, Autonomous Intelligent Systems
-   
+
+ ## Abstract:
+Semantic segmentation is a core ability required by autonomous agents, as being able to distinguish which parts of the scene belong to which object class is crucial for navigation and interaction with the environment. Approaches which use only one time-step of data cannot distinguish between moving objects nor can they benefit from temporal integration. In this work, we extend a backbone LatticeNet to process temporal point cloud data. Additionally, we take inspiration from optical flow methods and propose a new module called Abstract Flow which allows the network to match parts of the scene with similar abstract features and gather the information temporally. We obtain state-of-the-art results on the SemanticKITTI dataset that contains LiDAR scans from real urban environments.  
 
 <p align="middle">
   <img src="imgs/teaser.png" width="550" />
@@ -86,7 +88,6 @@ The entries can be: Linear/MaxPool/CGA/AFlow/LSTM/GRU/None. An example configura
 ```
 model: rnn_modules: ["gru", "gru", "aflow", "aflow"]
 ``` 
-AFlow can only be used for the last two fusion positions.
 Setting **accumulate_clouds: true** will accumulate all clouds of a sequence and use the original LatticeNet to predict the semantic segmentation. 
 
 ## Training 
@@ -125,9 +126,10 @@ To create a valid submission for the SemanticKITTI competition website, you have
 Various configuration options can be interesting to check out and modify. We take lnn_train_semantic_kitti.cfg as an example. 
 
 ```
-core: hdpi: false          #can be turned on an off to accomodate high DPI displays. If the text and fonts in the visualizer are too big, set this option to false
-train: with_viewer: false  #setting to true will start a visualizer which displays the currently segmented point cloud and the difference to the ground truth
-train: with_wandb: false   #setting to true will log loss, IoU and gradients to wandb (https://wandb.ai)
+core: hdpi: false          # can be turned on an off to accomodate high DPI displays. If the text and fonts in the visualizer are too big, set this option to false.
+train: with_viewer: false  # setting to true will start a visualizer which displays the currently segmented point cloud and the difference to the ground truth.
+train: with_wandb: false   # setting to true will log loss, IoU and gradients to wandb (https://wandb.ai).
+model: use_center: false   # by default, the AFlow module only uses the one-hop neighborhood without the center vertex. Setting this to true uses the center as well.
 ``` 
 <br/><br/>
 If training is performed with the viewer enabled, you should see something like this:
