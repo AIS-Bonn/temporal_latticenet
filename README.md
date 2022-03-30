@@ -1,6 +1,6 @@
 # Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice
 
-[Project Page](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/) | [Video](https://www.youtube.com/watch?v=ljjMDkSLl0g) | [Paper](https://arxiv.org/abs/2203.15469)
+[Project Page](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/) | [Video](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/ICRA_2022_Schuett.mp4) | [Paper](https://arxiv.org/abs/2203.15469)
 
 [Abstract Flow for Temporal Semantic Segmentation on the Permutohedral Lattice](https://www.ais.uni-bonn.de/videos/Temporal_LatticeNet/)  
  [Peer Sch&uuml;tt](https://www.ais.uni-bonn.de/schuett/) <sup>1</sup>,
