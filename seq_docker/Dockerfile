@@ -54,7 +54,7 @@ RUN sudo dpkg -i libeigen3-dev_3.3.7-3_all.deb
 WORKDIR /
 RUN git clone  https://github.com/pytorch/pytorch  /opt/pytorch
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends python3-pip python3-setuptools && sh "./cleanup.sh"
-RUN pip3 install numpy pyyaml mkl mkl-include typing dataclasses
+RUN pip3 install numpy pyyaml mkl mkl-include==2022.0.2 typing dataclasses
 WORKDIR /opt/pytorch
 RUN git checkout tags/v1.7.1
 RUN git submodule sync
