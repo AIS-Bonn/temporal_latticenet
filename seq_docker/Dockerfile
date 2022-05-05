@@ -19,6 +19,9 @@ ENV DEBIAN_FRONTEND noninteractive
 COPY cleanup.sh ./
 RUN chmod +x ./cleanup.sh
 
+# Update NVIDIA GPG Repository Key https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+
 # Basic Utilities (dirmngr and gpg-agent is needed so that apt-get adv works)
 RUN apt-get -y update && apt-get install -y --no-install-recommends sudo ssh tmux git meld cmake cmake-curses-gui htop vim iputils-ping apt-utils apt-transport-https software-properties-common wget build-essential gdb valgrind silversearcher-ag curl dirmngr gpg-agent checkinstall locate baobab ninja-build libncurses5-dev pkg-config && sh "./cleanup.sh"
 

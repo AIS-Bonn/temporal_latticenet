@@ -11,6 +11,9 @@ pushd `dirname $0` > /dev/null
 SCRIPTPATH=`pwd`
 popd > /dev/null
 
+# Need to download the .deb to install the Nvidia GPG Repository Key
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb
+
 # Build the docker image
 docker build\
   --build-arg user=$USER\
