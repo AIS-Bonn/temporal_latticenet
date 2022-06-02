@@ -19,6 +19,9 @@ ENV DEBIAN_FRONTEND noninteractive
 COPY cleanup.sh ./
 RUN chmod +x ./cleanup.sh
 
+# Update NVIDIA GPG Repository Key https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+
 # Basic Utilities (dirmngr and gpg-agent is needed so that apt-get adv works)
 RUN apt-get -y update && apt-get install -y --no-install-recommends sudo ssh tmux git meld cmake cmake-curses-gui htop vim iputils-ping apt-utils apt-transport-https software-properties-common wget build-essential gdb valgrind silversearcher-ag curl dirmngr gpg-agent checkinstall locate baobab ninja-build libncurses5-dev pkg-config && sh "./cleanup.sh"
 
@@ -51,7 +54,7 @@ RUN sudo dpkg -i libeigen3-dev_3.3.7-3_all.deb
 WORKDIR /
 RUN git clone  https://github.com/pytorch/pytorch  /opt/pytorch
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends python3-pip python3-setuptools && sh "./cleanup.sh"
-RUN pip3 install numpy pyyaml mkl mkl-include typing dataclasses
+RUN pip3 install numpy pyyaml mkl mkl-include==2022.0.2 typing dataclasses
 WORKDIR /opt/pytorch
 RUN git checkout tags/v1.7.1
 RUN git submodule sync
@@ -90,7 +93,7 @@ WORKDIR /
 #python3 libs 
 RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-tk python3-pyqt5 python3-crypto python3-gnupg python3-dbg && sh "./cleanup.sh"
 RUN sudo python3 -m pip install --upgrade pip
-RUN sudo apt-get update && sudo python3 -m pip install ipdb numpy jupyter h5py scipy ipython pillow matplotlib opencv-python wheel trollius rospkg asyncio netifaces visdom torchnet sympy tqdm dlutils sklearn scikit-image twine natsort termcolor && sh "./cleanup.sh"
+RUN sudo apt-get update && sudo python3 -m pip install ipdb numpy jupyter h5py scipy ipython pillow==4.1.1 wandb matplotlib opencv-python wheel trollius rospkg asyncio netifaces visdom torchnet sympy tqdm dlutils sklearn scikit-image twine natsort termcolor && sh "./cleanup.sh"
 RUN sudo python3 -m pip install --upgrade setuptools setuptools-git  && sh "./cleanup.sh" 
 
 RUN sudo pip install hjson torchviz plyfile
