@@ -86,7 +86,7 @@ The bool **sequence_learning** defines if the network should use temporal depend
 Meanwhile, **rnn_modules** is an array with four entries that defines the fusion modules at all possible positions. 
 The entries can be: Linear/MaxPool/CGA/AFlow/LSTM/GRU/None. An example configuration could be 
 ```
-model: rnn_modules: ["gru", "gru", "aflow", "aflow"]
+model: rnn_modules: ["gru", "gru", "aflow", "gru"]
 ``` 
 Setting **accumulate_clouds: true** will accumulate all clouds of a sequence and use the original LatticeNet to predict the semantic segmentation. 
 
@@ -106,10 +106,10 @@ Testing works similar to the training. A major difference is, that we need to lo
 
 ```
 checkpoint_path: "/workspace/temporal_latticenet/pretrained_models"
-load_checkpoint_model: "12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt"
+load_checkpoint_model: "02062022_2037_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-gru_frames4_scope3_epoch2.pt"
 ``` 
 
-The network would now load the pretrained model **12022022_0014_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-aflow_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*. By default, it will now evaluate all clouds that are part of the *test split* of SemanticKITTI. These are all clouds from the sequences 11 to 21. 
+The network would now load the pretrained model **02062022_2037_multi_Kitti_Ref_sigma0.6_typegru-gru-aflow-gru_frames4_scope3_epoch2.pt** that can be found in the folder */workspace/temporal_latticenet/pretrained_models*. By default, it will now evaluate all clouds that are part of the *test split* of SemanticKITTI. These are all clouds from the sequences 11 to 21. 
 
 Evaluating the network:
 ```sh
