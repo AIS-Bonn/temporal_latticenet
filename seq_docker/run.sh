@@ -23,8 +23,8 @@ if [ "$#" -ne 1 ]; then
 		--publish-all=true\
 		--net=host\
 		    -e SHELL\
-			--mount type=bind,source="/home/user/schuett/introduce_lattice/semantic_kitti",target=/workspace/Data/SemanticKitti \
-			--mount type=bind,source="/home/user/schuett/icra_temporal_latticenet",target=/workspace \
+			--mount type=bind,source="/home/nfs/inf6/data/datasets/SemanticKitti",target=/workspace/Data/SemanticKitti \
+			--mount type=bind,source="/home/user/schuett/icra_temp_latticenet",target=/workspace \
 				-e DISPLAY\
 				-e DOCKER=1\
 				-e WORKSPACE="/workspace/" \
